@@ -20,7 +20,10 @@ struct Operation {
 
 impl Operation {
     fn doc_base(&self) -> String {
-        let mut dc = format!("/// {}\n", self.description);
+        let mut dc = format!(
+            "/// {}\n",
+            self.description
+        );
         let required = self
             .required
             .iter()
@@ -35,27 +38,43 @@ impl Operation {
         format!(
             "/// {}_options: `&{}Options` -> optional arguments",
             self.name,
-            self.name.to_class_case()
+            self.name
+                .to_class_case()
         )
     }
 
     fn doc_returns(&self) -> String {
-        match self.output.len() {
+        match self
+            .output
+            .len()
+        {
             0 => String::new(),
             1 => format!(
                 "/// returns `{}` - {}",
-                self.output[0].param_type.struct_type(),
+                self.output[0]
+                    .param_type
+                    .struct_type(),
                 self.output[0].description
             ),
             _ => {
                 let res = self
                     .output
                     .iter()
-                    .map(|o| format!("/// {} - {}", o.param_type.struct_type(), o.description))
+                    .map(|o| {
+                        format!(
+                            "/// {} - {}",
+                            o.param_type
+                                .struct_type(),
+                            o.description
+                        )
+                    })
                     .collect::<Vec<_>>()
                     .join("\n");
 
-                format!("/// Tuple (\n{}\n///)", res)
+                format!(
+                    "/// Tuple (\n{}\n///)",
+                    res
+                )
             }
         }
     }
@@ -63,10 +82,22 @@ impl Operation {
     fn doc(&self, with_optional: bool) -> String {
         let base = self.doc_base();
         let returns = self.doc_returns();
-        if !self.optional.is_empty() && with_optional {
-            format!("{}\n{}\n{}", base, self.doc_optional(), returns)
+        if !self
+            .optional
+            .is_empty()
+            && with_optional
+        {
+            format!(
+                "{}\n{}\n{}",
+                base,
+                self.doc_optional(),
+                returns
+            )
         } else {
-            format!("{}\n{}", base, returns)
+            format!(
+                "{}\n{}",
+                base, returns
+            )
         }
     }
 
@@ -74,7 +105,13 @@ impl Operation {
         let declarations = self
             .optional
             .iter()
-            .map(|p| format!("{}\npub {}", p.doc_struct(), p.struct_declaration()))
+            .map(|p| {
+                format!(
+                    "{}\npub {}",
+                    p.doc_struct(),
+                    p.struct_declaration()
+                )
+            })
             .collect::<Vec<_>>()
             .join(",\n");
         let defaults = self
@@ -100,10 +137,13 @@ impl Operation {
             }}
             "#,
             self.name,
-            self.name.to_class_case(),
+            self.name
+                .to_class_case(),
             declarations,
-            self.name.to_class_case(),
-            self.name.to_class_case(),
+            self.name
+                .to_class_case(),
+            self.name
+                .to_class_case(),
             defaults
         )
     }
@@ -129,7 +169,11 @@ impl Operation {
                         r#"
             {}
             {}"#,
-                        p.declare_in_variable_optional(&self.name.to_snake_case()),
+                        p.declare_in_variable_optional(
+                            &self
+                                .name
+                                .to_snake_case()
+                        ),
                         p.declare_opt_name()
                     )
                 })
@@ -150,35 +194,83 @@ impl Operation {
 
     fn get_params(&self, with_optonal: bool) -> String {
         let mut all_params = Vec::new();
-        all_params.append(&mut self.required.clone());
-        all_params.append(&mut self.output.clone());
+        all_params.append(
+            &mut self
+                .required
+                .clone(),
+        );
+        all_params.append(
+            &mut self
+                .output
+                .clone(),
+        );
         all_params.sort_by_key(|p| p.order);
         let params = all_params
             .iter()
             .map(|p| {
-                if self.output.contains(p) {
-                    match p.param_type.clone() {
+                if self
+                    .output
+                    .contains(p)
+                {
+                    match p
+                        .param_type
+                        .clone()
+                    {
                         ParamType::ArrayByte => {
-                            format!("&mut {}_out, &mut {}_buf_size", p.name, p.name)
+                            format!(
+                                "&mut {}_out, &mut {}_buf_size",
+                                p.name, p.name
+                            )
                         }
                         ParamType::ArrayInt | ParamType::ArrayDouble | ParamType::ArrayImage => {
-                            format!("&mut {}_out, &mut {}_array_size", p.name, p.name)
+                            format!(
+                                "&mut {}_out, &mut {}_array_size",
+                                p.name, p.name
+                            )
                         }
-                        ParamType::VipsImage { prev: Some(prev) } => {
-                            format!("&mut {}_out, {}_len", p.name, prev)
+                        ParamType::VipsImage {
+                            prev: Some(prev),
+                        } => {
+                            format!(
+                                "&mut {}_out, {}_len",
+                                p.name, prev
+                            )
                         }
-                        _ => format!("&mut {}_out", p.name),
+                        _ => format!(
+                            "&mut {}_out",
+                            p.name
+                        ),
                     }
                 } else {
                     match p.param_type {
                         ParamType::ArrayInt | ParamType::ArrayDouble => {
-                            format!("{}_in, {}.len() as i32", p.name, p.name)
+                            format!(
+                                "{}_in, {}.len() as i32",
+                                p.name, p.name
+                            )
                         }
-                        ParamType::ArrayImage => format!("{}_in.as_mut_ptr()", p.name),
-                        ParamType::ArrayByte => format!("{}_in, {}.len() as u64", p.name, p.name),
-                        ParamType::Enum { .. } => format!("{}_in.try_into().unwrap()", p.name),
-                        ParamType::Str => format!("{}_in.as_ptr()", p.name),
-                        _ => format!("{}_in", p.name),
+                        ParamType::ArrayImage => format!(
+                            "{}_in.as_mut_ptr()",
+                            p.name
+                        ),
+                        ParamType::ArrayByte => format!(
+                            "{}_in, {}.len() as u64",
+                            p.name, p.name
+                        ),
+                        ParamType::Enum {
+                            ..
+                        } => format!(
+                            "{}_in.try_into().unwrap()",
+                            p.name
+                        ),
+                        ParamType::Str => format!(
+                            "{}_in.as_ptr()",
+                            p.name
+                        ),
+                        _ => format!(
+                            "{}_in",
+                            p.name
+                        ),
                     }
                 }
             })
@@ -206,9 +298,19 @@ impl Operation {
             .map(|p| p.as_out_param())
             .collect::<Vec<_>>()
             .join(",");
-        let out_result = if self.output.len() > 1 {
-            format!("({})", out_tuple)
-        } else if self.output.is_empty() {
+        let out_result = if self
+            .output
+            .len()
+            > 1
+        {
+            format!(
+                "({})",
+                out_tuple
+            )
+        } else if self
+            .output
+            .is_empty()
+        {
             String::from("()")
         } else {
             out_tuple
@@ -225,21 +327,28 @@ impl Operation {
             self.vips_name,
             self.get_params(with_optional),
             out_result,
-            self.name.to_class_case()
+            self.name
+                .to_class_case()
         )
     }
 
     fn declaration(&self, with_optional: bool) -> String {
         let name = if with_optional {
-            format!("{}_with_opts", self.name)
+            format!(
+                "{}_with_opts",
+                self.name
+            )
         } else {
-            self.name.clone()
+            self.name
+                .clone()
         };
         let params = if with_optional {
             let opt = format!(
                 "{}_options: &{}Options",
-                self.name.to_snake_case(),
-                self.name.to_class_case()
+                self.name
+                    .to_snake_case(),
+                self.name
+                    .to_class_case()
             );
             let params = self
                 .required
@@ -250,7 +359,10 @@ impl Operation {
             if params.is_empty() {
                 opt
             } else {
-                format!("{}, {}", params, opt)
+                format!(
+                    "{}, {}",
+                    params, opt
+                )
             }
         } else {
             self.required
@@ -259,27 +371,51 @@ impl Operation {
                 .collect::<Vec<_>>()
                 .join(", ")
         };
-        let return_type = if self.output.is_empty() {
+        let return_type = if self
+            .output
+            .is_empty()
+        {
             String::from("()")
-        } else if self.output.len() == 1 {
-            self.output[0].param_type.struct_type()
+        } else if self
+            .output
+            .len()
+            == 1
+        {
+            self.output[0]
+                .param_type
+                .struct_type()
         } else {
             let types = self
                 .output
                 .iter()
-                .map(|p| p.param_type.struct_type())
+                .map(|p| {
+                    p.param_type
+                        .struct_type()
+                })
                 .collect::<Vec<_>>()
                 .join(", ");
-            format!("({})", types)
+            format!(
+                "({})",
+                types
+            )
         };
-        format!("pub fn {}({}) -> Result<{}>", name, params, return_type)
+        format!(
+            "pub fn {}({}) -> Result<{}>",
+            name, params, return_type
+        )
     }
 
     fn enumeration(&self) -> Vec<String> {
         self.required
             .iter()
-            .chain(self.optional.iter())
-            .chain(self.output.iter())
+            .chain(
+                self.optional
+                    .iter(),
+            )
+            .chain(
+                self.output
+                    .iter(),
+            )
             .map(|p| p.enumeration())
             .filter(|s| !s.is_empty())
             .collect::<Vec<String>>()
@@ -297,7 +433,10 @@ impl Operation {
             self.declaration(false),
             self.method_body(false)
         );
-        if !self.optional.is_empty() {
+        if !self
+            .optional
+            .is_empty()
+        {
             main.push_str(
                 format!(
                     r#"
@@ -338,7 +477,8 @@ impl PartialEq for Parameter {
 
 impl Parameter {
     fn enumeration(&self) -> String {
-        self.param_type.enumeration()
+        self.param_type
+            .enumeration()
     }
 
     fn as_out_param(&self) -> String {
@@ -347,13 +487,40 @@ impl Parameter {
                 "utils::new_byte_array({}_out, {}_buf_size)",
                 self.name, self.name
             ),
-            ParamType::VipsImage { .. } => format!("VipsImage{{ ctx: {}_out }}", self.name),
-            ParamType::VipsInterpolate => format!("VipsInterpolate{{ ctx: {}_out }}", self.name),
-            ParamType::VipsBlob => format!("VipsBlob{{ ctx: {}_out }}.into()", self.name),
-            ParamType::Int { .. } | ParamType::UInt { .. } | ParamType::Double { .. } => {
-                format!("{}_out", self.name)
+            ParamType::VipsImage {
+                ..
+            } => format!(
+                "VipsImage{{ ctx: {}_out }}",
+                self.name
+            ),
+            ParamType::VipsInterpolate => format!(
+                "VipsInterpolate{{ ctx: {}_out }}",
+                self.name
+            ),
+            ParamType::VipsBlob => format!(
+                "VipsBlob{{ ctx: {}_out }}.into()",
+                self.name
+            ),
+            ParamType::Int {
+                ..
             }
-            ParamType::Bool { .. } => format!("{}_out != 0", self.name),
+            | ParamType::UInt {
+                ..
+            }
+            | ParamType::Double {
+                ..
+            } => {
+                format!(
+                    "{}_out",
+                    self.name
+                )
+            }
+            ParamType::Bool {
+                ..
+            } => format!(
+                "{}_out != 0",
+                self.name
+            ),
             ParamType::ArrayInt => format!(
                 "utils::new_int_array({}_out, {}_array_size)",
                 self.name, self.name
@@ -362,7 +529,10 @@ impl Parameter {
                 "utils::new_double_array({}_out, {}_array_size)",
                 self.name, self.name
             ),
-            _ => format!("*{}_out", self.name),
+            _ => format!(
+                "*{}_out",
+                self.name
+            ),
         }
     }
 
@@ -370,10 +540,13 @@ impl Parameter {
         let mut main_doc = format!(
             "/// {}: `{}` -> {}",
             self.name,
-            self.param_type.param_type(),
+            self.param_type
+                .param_type(),
             self.description
         );
-        let dc = self.param_type.doc();
+        let dc = self
+            .param_type
+            .doc();
         if !dc.is_empty() {
             main_doc.push('\n');
             main_doc.push_str(&dc);
@@ -385,10 +558,13 @@ impl Parameter {
         let mut main_doc = format!(
             "/// {}: `{}` -> {}",
             self.name,
-            self.param_type.struct_type(),
+            self.param_type
+                .struct_type(),
             self.description
         );
-        let dc = self.param_type.doc();
+        let dc = self
+            .param_type
+            .doc();
         if !dc.is_empty() {
             main_doc.push('\n');
             main_doc.push_str(&dc);
@@ -475,31 +651,45 @@ impl Parameter {
 
     fn declare_in_variable_optional(&self, opt_name: &str) -> String {
         match self.param_type {
-            ParamType::Int { .. } | ParamType::UInt { .. } | ParamType::Double { .. } => format!(
+            ParamType::Int {
+                ..
+            }
+            | ParamType::UInt {
+                ..
+            }
+            | ParamType::Double {
+                ..
+            } => format!(
                 "let {}_in: {} = {}_options.{};",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name
             ),
             ParamType::Str => format!(
                 "let {}_in: {} = utils::new_c_string(&{}_options.{})?;",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name
             ),
-            ParamType::Bool { .. } => format!(
+            ParamType::Bool {
+                ..
+            } => format!(
                 "let {}_in: {} = if {}_options.{} {{ 1 }} else {{ 0 }};",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name
             ),
             ParamType::ArrayDouble | ParamType::ArrayImage | ParamType::ArrayInt => format!(
                 "let {}_wrapper = {}::from(&{}_options.{}[..]); \nlet {}_in = {}_wrapper.ctx;",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name,
                 self.name,
@@ -508,25 +698,32 @@ impl Parameter {
             ParamType::ArrayByte => format!(
                 "let {}_in: {} = {}_options.{}.as_mut_ptr();",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name
             ),
             ParamType::VipsBlob
-            | ParamType::VipsImage { .. }
+            | ParamType::VipsImage {
+                ..
+            }
             | ParamType::VipsSource
             | ParamType::VipsTarget
             | ParamType::VipsInterpolate => format!(
                 "let {}_in: {} = {}_options.{}.ctx;",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name
             ),
-            ParamType::Enum { .. } => format!(
+            ParamType::Enum {
+                ..
+            } => format!(
                 "let {}_in: {} = {}_options.{} as i32;",
                 self.name,
-                self.param_type.vips_in_type(true),
+                self.param_type
+                    .vips_in_type(true),
                 opt_name,
                 self.name
             ),
@@ -542,60 +739,109 @@ impl Parameter {
 
     fn opt_param_pair(&self) -> String {
         let init_var = match self.param_type {
-            ParamType::Str => format!("{}_in.as_ptr()", self.name),
-            _ => format!("{}_in", self.name),
+            ParamType::Str => format!(
+                "{}_in.as_ptr()",
+                self.name
+            ),
+            _ => format!(
+                "{}_in",
+                self.name
+            ),
         };
-        format!("{}_in_name.as_ptr(), {}", self.name, init_var)
+        format!(
+            "{}_in_name.as_ptr(), {}",
+            self.name, init_var
+        )
     }
 
     fn declare_out_variable(&self) -> String {
         match self.param_type {
-            ParamType::ArrayByte { .. } => format!(
+            ParamType::ArrayByte {
+                ..
+            } => format!(
                 "let mut {}_buf_size: u64 = 0;\nlet mut {}_out: {} = null_mut();",
                 self.name,
                 self.name,
-                self.param_type.vips_out_type()
+                self.param_type
+                    .vips_out_type()
             ),
-            ParamType::Int { .. } | ParamType::Double { .. } | ParamType::UInt { .. } => format!(
+            ParamType::Int {
+                ..
+            }
+            | ParamType::Double {
+                ..
+            }
+            | ParamType::UInt {
+                ..
+            } => format!(
                 "let mut {}_out: {} = {};",
                 self.name,
-                self.param_type.vips_out_type(),
-                self.param_type.default()
+                self.param_type
+                    .vips_out_type(),
+                self.param_type
+                    .default()
             ),
             ParamType::ArrayDouble | ParamType::ArrayInt | ParamType::ArrayImage => format!(
                 "let mut {}_array_size: usize = 0;\nlet mut {}_out: {} = null_mut();",
                 self.name,
                 self.name,
-                self.param_type.vips_out_type()
+                self.param_type
+                    .vips_out_type()
             ),
-            ParamType::Bool { .. } => format!(
+            ParamType::Bool {
+                ..
+            } => format!(
                 "let mut {}_out: {} = 0;",
                 self.name,
-                self.param_type.vips_out_type()
+                self.param_type
+                    .vips_out_type()
             ),
             _ => format!(
                 "let mut {}_out: {} = null_mut();",
                 self.name,
-                self.param_type.vips_out_type()
+                self.param_type
+                    .vips_out_type()
             ),
         }
     }
 
     fn default(&self) -> String {
         match self.param_type {
-            ParamType::Str if self.description.contains("ICC") => {
-                format!("{}: String::from(\"sRGB\")", self.name)
+            ParamType::Str
+                if self
+                    .description
+                    .contains("ICC") =>
+            {
+                format!(
+                    "{}: String::from(\"sRGB\")",
+                    self.name
+                )
             }
-            _ => format!("{}: {}", self.name, self.param_type.default()),
+            _ => format!(
+                "{}: {}",
+                self.name,
+                self.param_type
+                    .default()
+            ),
         }
     }
 
     fn struct_declaration(&self) -> String {
-        format!("{}: {}", self.name, self.param_type.struct_type())
+        format!(
+            "{}: {}",
+            self.name,
+            self.param_type
+                .struct_type()
+        )
     }
 
     fn param_declaration(&self) -> String {
-        format!("{}: {}", self.name, self.param_type.param_type())
+        format!(
+            "{}: {}",
+            self.name,
+            self.param_type
+                .param_type()
+        )
     }
 }
 
@@ -641,25 +887,57 @@ enum ParamType {
 impl ParamType {
     fn doc(&self) -> String {
         match self {
-            ParamType::Int { min, max, default } => {
-                format!("/// min: {}, max: {}, default: {}", min, max, default)
+            ParamType::Int {
+                min,
+                max,
+                default,
+            } => {
+                format!(
+                    "/// min: {}, max: {}, default: {}",
+                    min, max, default
+                )
             }
-            ParamType::UInt { min, max, default } => {
-                format!("/// min: {}, max: {}, default: {}", min, max, default)
+            ParamType::UInt {
+                min,
+                max,
+                default,
+            } => {
+                format!(
+                    "/// min: {}, max: {}, default: {}",
+                    min, max, default
+                )
             }
-            ParamType::Double { min, max, default } => {
-                format!("/// min: {}, max: {}, default: {}", min, max, default)
+            ParamType::Double {
+                min,
+                max,
+                default,
+            } => {
+                format!(
+                    "/// min: {}, max: {}, default: {}",
+                    min, max, default
+                )
             }
-            ParamType::Bool { default } => format!("/// default: {}", default),
+            ParamType::Bool {
+                default,
+            } => format!(
+                "/// default: {}",
+                default
+            ),
             ParamType::Enum {
-                entries, default, ..
+                entries,
+                default,
+                ..
             } => entries
                 .iter()
                 .map(|e| {
                     if *default == e.value {
-                        format!("{} [DEFAULT]", e.doc())
+                        format!(
+                            "{} [DEFAULT]",
+                            e.doc()
+                        )
                     } else {
-                        e.doc().to_string()
+                        e.doc()
+                            .to_string()
                     }
                 })
                 .collect::<Vec<_>>()
@@ -670,46 +948,74 @@ impl ParamType {
 
     fn struct_type(&self) -> String {
         match self {
-            ParamType::Int { .. } => String::from("i32"),
-            ParamType::UInt { .. } => String::from("u64"),
-            ParamType::Double { .. } => String::from("f64"),
+            ParamType::Int {
+                ..
+            } => String::from("i32"),
+            ParamType::UInt {
+                ..
+            } => String::from("u64"),
+            ParamType::Double {
+                ..
+            } => String::from("f64"),
             ParamType::Str => String::from("String"),
-            ParamType::Bool { .. } => String::from("bool"),
+            ParamType::Bool {
+                ..
+            } => String::from("bool"),
             ParamType::ArrayInt => String::from("Vec<i32>"),
             ParamType::ArrayDouble => String::from("Vec<f64>"),
             ParamType::ArrayByte => String::from("Vec<u8>"),
             ParamType::ArrayImage => String::from("Vec<VipsImage>"),
             ParamType::VipsInterpolate => String::from("VipsInterpolate"),
-            ParamType::VipsImage { .. } => String::from("VipsImage"),
+            ParamType::VipsImage {
+                ..
+            } => String::from("VipsImage"),
             ParamType::VipsSource => String::from("VipsSource"),
             ParamType::VipsTarget => String::from("VipsTarget"),
             ParamType::VipsBlob => String::from("Vec<u8>"),
-            ParamType::Enum { name, .. } => Self::enum_name(name),
+            ParamType::Enum {
+                name,
+                ..
+            } => Self::enum_name(name),
         }
     }
 
     fn param_type(&self) -> String {
         match self {
-            ParamType::Int { .. } => String::from("i32"),
-            ParamType::UInt { .. } => String::from("u64"),
-            ParamType::Double { .. } => String::from("f64"),
+            ParamType::Int {
+                ..
+            } => String::from("i32"),
+            ParamType::UInt {
+                ..
+            } => String::from("u64"),
+            ParamType::Double {
+                ..
+            } => String::from("f64"),
             ParamType::Str => String::from("&str"),
-            ParamType::Bool { .. } => String::from("bool"),
+            ParamType::Bool {
+                ..
+            } => String::from("bool"),
             ParamType::ArrayInt => String::from("&mut [i32]"),
             ParamType::ArrayDouble => String::from("&mut [f64]"),
             ParamType::ArrayByte => String::from("&[u8]"),
             ParamType::ArrayImage => String::from("&mut [VipsImage]"),
             ParamType::VipsInterpolate => String::from("&VipsInterpolate"),
-            ParamType::VipsImage { .. } => String::from("&VipsImage"),
+            ParamType::VipsImage {
+                ..
+            } => String::from("&VipsImage"),
             ParamType::VipsSource => String::from("&VipsSource"),
             ParamType::VipsTarget => String::from("&VipsTarget"),
             ParamType::VipsBlob => String::from("&[u8]"),
-            ParamType::Enum { name, .. } => Self::enum_name(name),
+            ParamType::Enum {
+                name,
+                ..
+            } => Self::enum_name(name),
         }
     }
 
     fn enum_name(name: &str) -> String {
-        let split: Vec<&str> = name.split("Vips").collect();
+        let split: Vec<&str> = name
+            .split("Vips")
+            .collect();
         if split.len() > 1 {
             split[1].to_string()
         } else {
@@ -719,11 +1025,19 @@ impl ParamType {
 
     fn vips_in_type(&self, is_optional: bool) -> String {
         match self {
-            ParamType::Int { .. } => String::from("i32"),
-            ParamType::UInt { .. } => String::from("u64"),
-            ParamType::Double { .. } => String::from("f64"),
+            ParamType::Int {
+                ..
+            } => String::from("i32"),
+            ParamType::UInt {
+                ..
+            } => String::from("u64"),
+            ParamType::Double {
+                ..
+            } => String::from("f64"),
             ParamType::Str => String::from("CString"),
-            ParamType::Bool { .. } => String::from("i32"),
+            ParamType::Bool {
+                ..
+            } => String::from("i32"),
             ParamType::ArrayInt => {
                 if !is_optional {
                     String::from("*mut i32")
@@ -747,47 +1061,83 @@ impl ParamType {
                 }
             }
             ParamType::VipsInterpolate => String::from("*mut bindings::VipsInterpolate"),
-            ParamType::VipsImage { .. } => String::from("*mut bindings::VipsImage"),
+            ParamType::VipsImage {
+                ..
+            } => String::from("*mut bindings::VipsImage"),
             ParamType::VipsSource => String::from("*mut bindings::VipsSource"),
             ParamType::VipsTarget => String::from("*mut bindings::VipsTarget"),
             ParamType::VipsBlob => String::from("*mut bindings::VipsBlob"),
-            ParamType::Enum { .. } => String::from("i32"),
+            ParamType::Enum {
+                ..
+            } => String::from("i32"),
         }
     }
 
     fn vips_out_type(&self) -> String {
         match self {
-            ParamType::Int { .. } => String::from("i32"),
-            ParamType::UInt { .. } => String::from("u64"),
-            ParamType::Double { .. } => String::from("f64"),
+            ParamType::Int {
+                ..
+            } => String::from("i32"),
+            ParamType::UInt {
+                ..
+            } => String::from("u64"),
+            ParamType::Double {
+                ..
+            } => String::from("f64"),
             ParamType::Str => String::from("*mut c_char"),
-            ParamType::Bool { .. } => String::from("i32"),
+            ParamType::Bool {
+                ..
+            } => String::from("i32"),
             ParamType::ArrayInt => String::from("*mut i32"),
             ParamType::ArrayDouble => String::from("*mut f64"),
             ParamType::ArrayByte => String::from("*mut c_void"),
             ParamType::ArrayImage => String::from("*mut bindings::VipsImage"),
             ParamType::VipsInterpolate => String::from("*mut bindings::VipsInterpolate"),
-            ParamType::VipsImage { .. } => String::from("*mut bindings::VipsImage"),
+            ParamType::VipsImage {
+                ..
+            } => String::from("*mut bindings::VipsImage"),
             ParamType::VipsSource => String::from("*mut bindings::VipsSource"),
             ParamType::VipsTarget => String::from("*mut bindings::VipsTarget"),
             ParamType::VipsBlob => String::from("*mut bindings::VipsBlob"),
-            ParamType::Enum { .. } => String::from("*mut i32"),
+            ParamType::Enum {
+                ..
+            } => String::from("*mut i32"),
         }
     }
 
     fn default(&self) -> String {
         match self {
-            ParamType::Int { default, .. } => format!("i32::from({})", default),
-            ParamType::UInt { default, .. } => default.to_string(),
-            ParamType::Double { default, .. } => format!("f64::from({})", default),
+            ParamType::Int {
+                default,
+                ..
+            } => format!(
+                "i32::from({})",
+                default
+            ),
+            ParamType::UInt {
+                default,
+                ..
+            } => default.to_string(),
+            ParamType::Double {
+                default,
+                ..
+            } => format!(
+                "f64::from({})",
+                default
+            ),
             ParamType::Str => String::from("String::new()"),
-            ParamType::Bool { default, .. } => default.to_string(),
+            ParamType::Bool {
+                default,
+                ..
+            } => default.to_string(),
             ParamType::ArrayInt => String::from("Vec::new()"),
             ParamType::ArrayDouble => String::from("Vec::new()"),
             ParamType::ArrayByte => String::from("Vec::new()"),
             ParamType::ArrayImage => String::from("Vec::new()"),
             ParamType::VipsInterpolate => String::from("VipsInterpolate::new()"),
-            ParamType::VipsImage { .. } => String::from("VipsImage::new()"),
+            ParamType::VipsImage {
+                ..
+            } => String::from("VipsImage::new()"),
             ParamType::VipsSource => String::from("VipsSource::new()"),
             ParamType::VipsTarget => String::from("VipsTarget::new()"),
             ParamType::VipsBlob => String::from("Vec::new()"),
@@ -798,7 +1148,14 @@ impl ParamType {
             } => entries
                 .iter()
                 .filter(|e| *default == e.value)
-                .map(|e| format!("{}::{}", Self::enum_name(name), e.nick.to_class_case()))
+                .map(|e| {
+                    format!(
+                        "{}::{}",
+                        Self::enum_name(name),
+                        e.nick
+                            .to_class_case()
+                    )
+                })
                 .collect::<Vec<_>>()[0]
                 .clone(),
         }
@@ -806,7 +1163,11 @@ impl ParamType {
 
     fn enumeration(&self) -> String {
         match self {
-            ParamType::Enum { name, entries, .. } => {
+            ParamType::Enum {
+                name,
+                entries,
+                ..
+            } => {
                 let enum_entries = entries
                     .iter()
                     .map(|e| e.code())
@@ -839,7 +1200,8 @@ impl Enumeration {
     fn doc(&self) -> String {
         format!(
             "///  `{}` -> {} = {}",
-            self.nick.to_class_case(),
+            self.nick
+                .to_class_case(),
             self.name,
             self.value
         )
@@ -852,7 +1214,8 @@ impl Enumeration {
             if self.name == "VIPS_INTERPRETATION_LABS" {
                 String::from("Labs")
             } else {
-                self.nick.to_class_case()
+                self.nick
+                    .to_class_case()
             },
             self.value
         )
@@ -888,22 +1251,42 @@ fn split_flags(output: &[u8]) -> Vec<String> {
     words
 }
 
-fn parse_param(param_list: Vec<&str>, order: u8, prev: Option<String>) -> (bool, Parameter) {
+fn parse_param(
+    param_list: Vec<&str>,
+    order: u8,
+    prev: Option<String>,
+) -> (
+    bool,
+    Parameter,
+) {
     let (mut param_name, is_output) = if param_list[0].starts_with("OUTPUT:") {
-        let splited: Vec<&str> = param_list[0].split("OUTPUT:").collect();
-        (String::from(splited[1]), true)
+        let splited: Vec<&str> = param_list[0]
+            .split("OUTPUT:")
+            .collect();
+        (
+            String::from(splited[1]),
+            true,
+        )
     } else {
-        (String::from(param_list[0]), false)
+        (
+            String::from(param_list[0]),
+            false,
+        )
     };
     if ["in", "ref"].contains(&param_name.as_str()) {
-        param_name = format!("{}p", param_name);
+        param_name = format!(
+            "{}p",
+            param_name
+        );
     }
     let nick = param_list[1];
     let description = param_list[2];
     let param_type = if param_list[3].starts_with("string") {
         ParamType::Str
     } else if param_list[3].starts_with("VipsImage") {
-        ParamType::VipsImage { prev }
+        ParamType::VipsImage {
+            prev,
+        }
     } else if param_list[3].starts_with("VipsBlob") {
         ParamType::VipsBlob
     } else if param_list[3].starts_with("VipsInterpolate") {
@@ -913,29 +1296,70 @@ fn parse_param(param_list: Vec<&str>, order: u8, prev: Option<String>) -> (bool,
     } else if param_list[3].starts_with("VipsTarget") {
         ParamType::VipsTarget
     } else if param_list[3].starts_with("bool") {
-        let default = param_list[3].split(':').collect::<Vec<&str>>()[1] == "1";
-        ParamType::Bool { default }
+        let default = param_list[3]
+            .split(':')
+            .collect::<Vec<&str>>()[1]
+            == "1";
+        ParamType::Bool {
+            default,
+        }
     } else if param_list[3].starts_with("int") {
-        let strs: Vec<&str> = param_list[3].split(':').collect();
+        let strs: Vec<&str> = param_list[3]
+            .split(':')
+            .collect();
 
-        let min = strs[1].parse().expect("Cannot parse number");
-        let max = strs[2].parse().expect("Cannot parse number");
-        let default = strs[3].parse().expect("Cannot parse number");
-        ParamType::Int { min, max, default }
+        let min = strs[1]
+            .parse()
+            .expect("Cannot parse number");
+        let max = strs[2]
+            .parse()
+            .expect("Cannot parse number");
+        let default = strs[3]
+            .parse()
+            .expect("Cannot parse number");
+        ParamType::Int {
+            min,
+            max,
+            default,
+        }
     } else if param_list[3].starts_with("double") {
-        let strs: Vec<&str> = param_list[3].split(':').collect();
+        let strs: Vec<&str> = param_list[3]
+            .split(':')
+            .collect();
 
-        let min = strs[1].parse().expect("Cannot parse number");
-        let max = strs[2].parse().expect("Cannot parse number");
-        let default = strs[3].parse().expect("Cannot parse number");
-        ParamType::Double { min, max, default }
+        let min = strs[1]
+            .parse()
+            .expect("Cannot parse number");
+        let max = strs[2]
+            .parse()
+            .expect("Cannot parse number");
+        let default = strs[3]
+            .parse()
+            .expect("Cannot parse number");
+        ParamType::Double {
+            min,
+            max,
+            default,
+        }
     } else if param_list[3].starts_with("uint64") {
-        let strs: Vec<&str> = param_list[3].split(':').collect();
+        let strs: Vec<&str> = param_list[3]
+            .split(':')
+            .collect();
 
-        let min = strs[1].parse().expect("Cannot parse number");
-        let max = strs[2].parse().expect("Cannot parse number");
-        let default = strs[3].parse().expect("Cannot parse number");
-        ParamType::UInt { min, max, default }
+        let min = strs[1]
+            .parse()
+            .expect("Cannot parse number");
+        let max = strs[2]
+            .parse()
+            .expect("Cannot parse number");
+        let default = strs[3]
+            .parse()
+            .expect("Cannot parse number");
+        ParamType::UInt {
+            min,
+            max,
+            default,
+        }
     } else if param_list[3].starts_with("byte-data") {
         ParamType::ArrayByte
     } else if param_list[3].starts_with("array of int") {
@@ -945,26 +1369,40 @@ fn parse_param(param_list: Vec<&str>, order: u8, prev: Option<String>) -> (bool,
     } else if param_list[3].starts_with("array of images") {
         ParamType::ArrayImage
     } else if param_list[3].starts_with("enum") || param_list[3].starts_with("flags") {
-        let enum_name = param_list[3].split('-').collect::<Vec<_>>()[1];
+        let enum_name = param_list[3]
+            .split('-')
+            .collect::<Vec<_>>()[1];
 
         let enum_values = param_list
             .iter()
             .take(param_list.len() - 1)
             .skip(4)
             .map(|param| {
-                let enum_strs = param.split(':').collect::<Vec<_>>();
+                let enum_strs = param
+                    .split(':')
+                    .collect::<Vec<_>>();
 
-                let value = enum_strs[0].parse().expect("Cannot parse number");
+                let value = enum_strs[0]
+                    .parse()
+                    .expect("Cannot parse number");
                 let nick = enum_strs[1].to_string();
                 let name = enum_strs[2].to_string();
 
-                Enumeration { name, nick, value }
+                Enumeration {
+                    name,
+                    nick,
+                    value,
+                }
             })
             .collect::<Vec<_>>();
 
         let default = param_list
             .last()
-            .and_then(|param| param.parse::<i32>().ok())
+            .and_then(|param| {
+                param
+                    .parse::<i32>()
+                    .ok()
+            })
             .expect("can't get default");
 
         ParamType::Enum {
@@ -973,7 +1411,10 @@ fn parse_param(param_list: Vec<&str>, order: u8, prev: Option<String>) -> (bool,
             default,
         }
     } else {
-        panic!("Unsupported type: {}", param_list[3])
+        panic!(
+            "Unsupported type: {}",
+            param_list[3]
+        )
     };
     (
         is_output,
@@ -992,136 +1433,168 @@ fn parse_output(output: String) -> Vec<Operation> {
     output
         .split("OPERATION:")
         .filter(|op| !op.is_empty())
-        .map(|op_str: &str| {
-            let mut required: Vec<Parameter> = Vec::new();
-            let mut optional: Vec<Parameter> = Vec::new();
-            let mut output: Vec<Parameter> = Vec::new();
+        .map(
+            |op_str: &str| {
+                let mut required: Vec<Parameter> = Vec::new();
+                let mut optional: Vec<Parameter> = Vec::new();
+                let mut output: Vec<Parameter> = Vec::new();
 
-            let mut op_iter = op_str.lines().filter(|op| !op.is_empty());
+                let mut op_iter = op_str
+                    .lines()
+                    .filter(|op| !op.is_empty());
 
-            let op_vals: Vec<&str> = op_iter
-                .by_ref()
-                .take_while(|line| *line != "REQUIRED:")
-                .collect();
+                let op_vals: Vec<&str> = op_iter
+                    .by_ref()
+                    .take_while(|line| *line != "REQUIRED:")
+                    .collect();
 
-            let name_split = op_vals[0].split(':').collect::<Vec<_>>();
-            let description = op_vals[1].to_string();
+                let name_split = op_vals[0]
+                    .split(':')
+                    .collect::<Vec<_>>();
+                let description = op_vals[1].to_string();
 
-            let mut required_vals = op_iter
-                .by_ref()
-                .take_while(|line| *line != "OPTIONAL:")
-                .skip(1)
-                .peekable(); // skip the first line PARAM:
-            let mut order: u8 = 0;
-            while required_vals.peek().is_some() {
-                //VipsAffine is wrong in the introspection
-                if name_split[1] == "VipsAffine" && order > 1 {
-                    required.push(Parameter {
-                        order: 2,
-                        name: String::from("a"),
-                        vips_name: String::from("a"),
-                        nick: String::from("Transformation Matrix"),
-                        description: String::from("Transformation Matrix coefficient"),
-                        param_type: ParamType::Double {
-                            min: -std::f64::INFINITY,
-                            max: std::f64::INFINITY,
-                            default: 0.0,
-                        },
-                    });
-                    required.push(Parameter {
-                        order: 3,
-                        name: String::from("b"),
-                        vips_name: String::from("b"),
-                        nick: String::from("Transformation Matrix"),
-                        description: String::from("Transformation Matrix coefficient"),
-                        param_type: ParamType::Double {
-                            min: -std::f64::INFINITY,
-                            max: std::f64::INFINITY,
-                            default: 0.0,
-                        },
-                    });
-                    required.push(Parameter {
-                        order: 4,
-                        name: String::from("c"),
-                        vips_name: String::from("c"),
-                        nick: String::from("Transformation Matrix"),
-                        description: String::from("Transformation Matrix coefficient"),
-                        param_type: ParamType::Double {
-                            min: -std::f64::INFINITY,
-                            max: std::f64::INFINITY,
-                            default: 0.0,
-                        },
-                    });
-                    required.push(Parameter {
-                        order: 5,
-                        name: String::from("d"),
-                        vips_name: String::from("d"),
-                        nick: String::from("Transformation Matrix"),
-                        description: String::from("Transformation Matrix coefficient"),
-                        param_type: ParamType::Double {
-                            min: -std::f64::INFINITY,
-                            max: std::f64::INFINITY,
-                            default: 0.0,
-                        },
-                    });
-                    required_vals
-                        .by_ref()
-                        .take_while(|line| *line != "PARAM:")
-                        .for_each(drop);
-                } else {
-                    let prev = if !required.is_empty() && order == 1 {
-                        match required[0].param_type {
-                            ParamType::ArrayImage => Some(required[0].name.clone()),
-                            _ => None,
-                        }
-                    } else {
-                        None
-                    };
-                    let (is_output, param) = parse_param(
+                let mut required_vals = op_iter
+                    .by_ref()
+                    .take_while(|line| *line != "OPTIONAL:")
+                    .skip(1)
+                    .peekable(); // skip the first line PARAM:
+                let mut order: u8 = 0;
+                while required_vals
+                    .peek()
+                    .is_some()
+                {
+                    //VipsAffine is wrong in the introspection
+                    if name_split[1] == "VipsAffine" && order > 1 {
+                        required.push(
+                            Parameter {
+                                order: 2,
+                                name: String::from("a"),
+                                vips_name: String::from("a"),
+                                nick: String::from("Transformation Matrix"),
+                                description: String::from("Transformation Matrix coefficient"),
+                                param_type: ParamType::Double {
+                                    min: -std::f64::INFINITY,
+                                    max: std::f64::INFINITY,
+                                    default: 0.0,
+                                },
+                            },
+                        );
+                        required.push(
+                            Parameter {
+                                order: 3,
+                                name: String::from("b"),
+                                vips_name: String::from("b"),
+                                nick: String::from("Transformation Matrix"),
+                                description: String::from("Transformation Matrix coefficient"),
+                                param_type: ParamType::Double {
+                                    min: -std::f64::INFINITY,
+                                    max: std::f64::INFINITY,
+                                    default: 0.0,
+                                },
+                            },
+                        );
+                        required.push(
+                            Parameter {
+                                order: 4,
+                                name: String::from("c"),
+                                vips_name: String::from("c"),
+                                nick: String::from("Transformation Matrix"),
+                                description: String::from("Transformation Matrix coefficient"),
+                                param_type: ParamType::Double {
+                                    min: -std::f64::INFINITY,
+                                    max: std::f64::INFINITY,
+                                    default: 0.0,
+                                },
+                            },
+                        );
+                        required.push(
+                            Parameter {
+                                order: 5,
+                                name: String::from("d"),
+                                vips_name: String::from("d"),
+                                nick: String::from("Transformation Matrix"),
+                                description: String::from("Transformation Matrix coefficient"),
+                                param_type: ParamType::Double {
+                                    min: -std::f64::INFINITY,
+                                    max: std::f64::INFINITY,
+                                    default: 0.0,
+                                },
+                            },
+                        );
                         required_vals
                             .by_ref()
                             .take_while(|line| *line != "PARAM:")
-                            .collect(),
-                        order,
-                        prev,
-                    );
-                    if is_output {
-                        output.push(param);
+                            .for_each(drop);
                     } else {
-                        required.push(param);
+                        let prev = if !required.is_empty() && order == 1 {
+                            match required[0].param_type {
+                                ParamType::ArrayImage => Some(
+                                    required[0]
+                                        .name
+                                        .clone(),
+                                ),
+                                _ => None,
+                            }
+                        } else {
+                            None
+                        };
+                        let (is_output, param) = parse_param(
+                            required_vals
+                                .by_ref()
+                                .take_while(|line| *line != "PARAM:")
+                                .collect(),
+                            order,
+                            prev,
+                        );
+                        if is_output {
+                            output.push(param);
+                        } else {
+                            required.push(param);
+                        }
+                        order += 1;
                     }
-                    order += 1;
                 }
-            }
-            let mut optionals = op_iter.skip(1).peekable();
-            while optionals.peek().is_some() {
-                let param_list = optionals
-                    .by_ref()
-                    .take_while(|line| *line != "PARAM:")
-                    .collect();
+                let mut optionals = op_iter
+                    .skip(1)
+                    .peekable();
+                while optionals
+                    .peek()
+                    .is_some()
+                {
+                    let param_list = optionals
+                        .by_ref()
+                        .take_while(|line| *line != "PARAM:")
+                        .collect();
 
-                let (_, param) = parse_param(param_list, 0, None);
-                optional.push(param);
-            }
-            Operation {
-                name: if name_split[0] == "match" {
-                    String::from("matches")
-                } else {
-                    String::from(name_split[0]).to_snake_case()
-                },
-                vips_name: String::from(name_split[0]),
-                vips_operation: String::from(name_split[1]),
-                description,
-                required,
-                optional,
-                output,
-            }
-        })
+                    let (_, param) = parse_param(
+                        param_list,
+                        0,
+                        None,
+                    );
+                    optional.push(param);
+                }
+                Operation {
+                    name: if name_split[0] == "match" {
+                        String::from("matches")
+                    } else {
+                        String::from(name_split[0]).to_snake_case()
+                    },
+                    vips_name: String::from(name_split[0]),
+                    vips_operation: String::from(name_split[1]),
+                    description,
+                    required,
+                    optional,
+                    output,
+                }
+            },
+        )
         .collect()
 }
 
 fn run(mut cmd: Command) -> Vec<String> {
-    let output = cmd.output().expect("Couldn't run pkg-config");
+    let output = cmd
+        .output()
+        .expect("Couldn't run pkg-config");
     split_flags(&output.stdout[..])
 }
 
@@ -1131,7 +1604,12 @@ fn rustfmt_path() -> io::Result<PathBuf> {
     }
     match which::which("rustfmt") {
         Ok(p) => Ok(p),
-        Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("{}", e))),
+        Err(e) => Err(
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("{}", e),
+            ),
+        ),
     }
 }
 
@@ -1139,11 +1617,18 @@ fn rustfmt_generated_strin(source: &str) -> io::Result<String> {
     let rustfmt = rustfmt_path()?;
     let mut cmd = Command::new(&*rustfmt);
 
-    cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
+    cmd.stdin(Stdio::piped())
+        .stdout(Stdio::piped());
 
     let mut child = cmd.spawn()?;
-    let mut child_stdin = child.stdin.take().unwrap();
-    let mut child_stdout = child.stdout.take().unwrap();
+    let mut child_stdin = child
+        .stdin
+        .take()
+        .unwrap();
+    let mut child_stdout = child
+        .stdout
+        .take()
+        .unwrap();
 
     let source = source.to_owned();
 
@@ -1156,29 +1641,38 @@ fn rustfmt_generated_strin(source: &str) -> io::Result<String> {
     });
 
     let mut output = vec![];
-    io::copy(&mut child_stdout, &mut output)?;
+    io::copy(
+        &mut child_stdout,
+        &mut output,
+    )?;
 
     let status = child.wait()?;
-    let source = stdin_handle.join().expect(
-        "The thread writing to rustfmt's stdin doesn't do \
+    let source = stdin_handle
+        .join()
+        .expect(
+            "The thread writing to rustfmt's stdin doesn't do \
          anything that could panic",
-    );
+        );
 
     match String::from_utf8(output) {
         Ok(bindings) => match status.code() {
             Some(0) => Ok(bindings),
-            Some(2) => Err(io::Error::new(
-                io::ErrorKind::Other,
-                "Rustfmt parsing errors.".to_string(),
-            )),
+            Some(2) => Err(
+                io::Error::new(
+                    io::ErrorKind::Other,
+                    "Rustfmt parsing errors.".to_string(),
+                ),
+            ),
             Some(3) => {
                 println!("Rustfmt could not format some lines.");
                 Ok(bindings)
             }
-            _ => Err(io::Error::new(
-                io::ErrorKind::Other,
-                "Internal rustfmt error".to_string(),
-            )),
+            _ => Err(
+                io::Error::new(
+                    io::ErrorKind::Other,
+                    "Internal rustfmt error".to_string(),
+                ),
+            ),
         },
         _ => Ok(source),
     }
@@ -1196,9 +1690,29 @@ fn main() {
         "VipsForeignLoadSvgSource",
     ];
 
-    println!("cargo:rustc-link-lib=vips");
-    println!("cargo:rustc-link-lib=glib-2.0");
-    println!("cargo:rustc-link-lib=gobject-2.0");
+    let target_os = env::var("CARGO_CFG_TARGET_OS");
+    match target_os
+        .as_ref()
+        .map(|x| &**x)
+    {
+        Ok("windows") => {
+            use std::path::Path;
+            println!("cargo:rustc-link-lib=libvips");
+            println!("cargo:rustc-link-lib=libglib-2.0");
+            println!("cargo:rustc-link-lib=libgobject-2.0");
+            let dir = env::var("LIBVIPS_LIB_DIR").unwrap();
+            println!(
+                "cargo:rustc-link-search=native={}",
+                Path::new(&dir).display()
+            );
+        }
+
+        _ => {
+            println!("cargo:rustc-link-lib=vips");
+            println!("cargo:rustc-link-lib=glib-2.0");
+            println!("cargo:rustc-link-lib=gobject-2.0");
+        }
+    }
     println!("cargo:rerun-if-changed=vips.h");
     let mut cmd = Command::new("pkg-config");
     cmd.args(["--cflags", "vips"]);
@@ -1233,7 +1747,9 @@ fn main() {
     for flag in flags.into_iter() {
         generator = generator.clang_arg(flag);
     }
-    let bindings = generator.generate().expect("Unable to generate bindings");
+    let bindings = generator
+        .generate()
+        .expect("Unable to generate bindings");
 
     let mut cmd_introspect = Command::new("pkg-config");
     cmd_introspect.args(["--cflags", "--libs", "vips"]);
@@ -1250,10 +1766,18 @@ fn main() {
         .flag("-g")
         .get_compiler()
         .to_command();
-    let result = cc_cmd.arg("introspect.c").status();
-    if result.is_ok() && !result.unwrap().success() {
+    let result = cc_cmd
+        .arg("introspect.c")
+        .status();
+    if result.is_ok()
+        && !result
+            .unwrap()
+            .success()
+    {
         let mut cmd = Command::new("./compile.sh");
-        let res = cmd.status().expect("Couldn't compile introspect.c");
+        let res = cmd
+            .status()
+            .expect("Couldn't compile introspect.c");
         if !res.success() {
             panic!("Failed to compile introspect.c");
         }
@@ -1266,13 +1790,21 @@ fn main() {
     let output =
         String::from_utf8(vips_introspection.stdout).expect("Could not parse introspection output");
     let operations = parse_output(output);
-    println!("{:#?}", operations);
+    println!(
+        "{:#?}",
+        operations
+    );
     println!(
         "{:#?}",
         operations
             .iter()
-            .filter(|o| o.output.len() > 1)
-            .map(|o| o.name.clone())
+            .filter(|o| o
+                .output
+                .len()
+                > 1)
+            .map(|o| o
+                .name
+                .clone())
             .collect::<Vec<_>>()
     );
 
@@ -1298,7 +1830,10 @@ fn main() {
 
     let mut enums: Vec<String> = operations
         .iter()
-        .flat_map(|o| o.enumeration().into_iter())
+        .flat_map(|o| {
+            o.enumeration()
+                .into_iter()
+        })
         .collect();
     enums.sort();
     enums.dedup(); // not working

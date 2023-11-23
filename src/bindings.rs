@@ -8,7 +8,9 @@ pub struct __BindgenBitfieldUnit<Storage> {
 impl<Storage> __BindgenBitfieldUnit<Storage> {
     #[inline]
     pub const fn new(storage: Storage) -> Self {
-        Self { storage }
+        Self {
+            storage,
+        }
     }
 }
 impl<Storage> __BindgenBitfieldUnit<Storage>
@@ -17,27 +19,35 @@ where
 {
     #[inline]
     pub fn get_bit(&self, index: usize) -> bool {
-        debug_assert!(index / 8 < self.storage.as_ref().len());
+        debug_assert!(
+            index / 8
+                < self
+                    .storage
+                    .as_ref()
+                    .len()
+        );
         let byte_index = index / 8;
-        let byte = self.storage.as_ref()[byte_index];
-        let bit_index = if cfg!(target_endian = "big") {
-            7 - (index % 8)
-        } else {
-            index % 8
-        };
+        let byte = self
+            .storage
+            .as_ref()[byte_index];
+        let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
         byte & mask == mask
     }
     #[inline]
     pub fn set_bit(&mut self, index: usize, val: bool) {
-        debug_assert!(index / 8 < self.storage.as_ref().len());
+        debug_assert!(
+            index / 8
+                < self
+                    .storage
+                    .as_ref()
+                    .len()
+        );
         let byte_index = index / 8;
-        let byte = &mut self.storage.as_mut()[byte_index];
-        let bit_index = if cfg!(target_endian = "big") {
-            7 - (index % 8)
-        } else {
-            index % 8
-        };
+        let byte = &mut self
+            .storage
+            .as_mut()[byte_index];
+        let bit_index = if cfg!(target_endian = "big") { 7 - (index % 8) } else { index % 8 };
         let mask = 1 << bit_index;
         if val {
             *byte |= mask;
@@ -48,16 +58,25 @@ where
     #[inline]
     pub fn get(&self, bit_offset: usize, bit_width: u8) -> u64 {
         debug_assert!(bit_width <= 64);
-        debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
-        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
+        debug_assert!(
+            bit_offset / 8
+                < self
+                    .storage
+                    .as_ref()
+                    .len()
+        );
+        debug_assert!(
+            (bit_offset + (bit_width as usize)) / 8
+                <= self
+                    .storage
+                    .as_ref()
+                    .len()
+        );
         let mut val = 0;
         for i in 0..(bit_width as usize) {
             if self.get_bit(i + bit_offset) {
-                let index = if cfg!(target_endian = "big") {
-                    bit_width as usize - 1 - i
-                } else {
-                    i
-                };
+                let index =
+                    if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
                 val |= 1 << index;
             }
         }
@@ -66,17 +85,28 @@ where
     #[inline]
     pub fn set(&mut self, bit_offset: usize, bit_width: u8, val: u64) {
         debug_assert!(bit_width <= 64);
-        debug_assert!(bit_offset / 8 < self.storage.as_ref().len());
-        debug_assert!((bit_offset + (bit_width as usize)) / 8 <= self.storage.as_ref().len());
+        debug_assert!(
+            bit_offset / 8
+                < self
+                    .storage
+                    .as_ref()
+                    .len()
+        );
+        debug_assert!(
+            (bit_offset + (bit_width as usize)) / 8
+                <= self
+                    .storage
+                    .as_ref()
+                    .len()
+        );
         for i in 0..(bit_width as usize) {
             let mask = 1 << i;
             let val_bit_is_set = val & mask == mask;
-            let index = if cfg!(target_endian = "big") {
-                bit_width as usize - 1 - i
-            } else {
-                i
-            };
-            self.set_bit(index + bit_offset, val_bit_is_set);
+            let index = if cfg!(target_endian = "big") { bit_width as usize - 1 - i } else { i };
+            self.set_bit(
+                index + bit_offset,
+                val_bit_is_set,
+            );
         }
     }
 }
@@ -1201,7 +1231,7 @@ pub const VIPS_D3250_X0: f64 = 105.659;
 pub const VIPS_D3250_Y0: f64 = 100.0;
 pub const VIPS_D3250_Z0: f64 = 45.8501;
 pub type wchar_t = ::std::os::raw::c_int;
-pub type size_t = ::std::os::raw::c_ulong;
+pub type size_t = u64;
 extern "C" {
     pub fn __flt_rounds() -> ::std::os::raw::c_int;
 }
@@ -1211,8 +1241,8 @@ pub type gint16 = ::std::os::raw::c_short;
 pub type guint16 = ::std::os::raw::c_ushort;
 pub type gint32 = ::std::os::raw::c_int;
 pub type guint32 = ::std::os::raw::c_uint;
-pub type gint64 = ::std::os::raw::c_long;
-pub type guint64 = ::std::os::raw::c_ulong;
+pub type gint64 = i64;
+pub type guint64 = u64;
 pub type gssize = ::std::os::raw::c_long;
 pub type gsize = ::std::os::raw::c_ulong;
 pub type goffset = gint64;
@@ -1236,12 +1266,18 @@ fn bindgen_test_layout_timespec() {
     assert_eq!(
         ::std::mem::size_of::<timespec>(),
         16usize,
-        concat!("Size of: ", stringify!(timespec))
+        concat!(
+            "Size of: ",
+            stringify!(timespec)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<timespec>(),
         8usize,
-        concat!("Alignment of ", stringify!(timespec))
+        concat!(
+            "Alignment of ",
+            stringify!(timespec)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
@@ -1293,12 +1329,18 @@ fn bindgen_test_layout_tm() {
     assert_eq!(
         ::std::mem::size_of::<tm>(),
         56usize,
-        concat!("Size of: ", stringify!(tm))
+        concat!(
+            "Size of: ",
+            stringify!(tm)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<tm>(),
         8usize,
-        concat!("Alignment of ", stringify!(tm))
+        concat!(
+            "Alignment of ",
+            stringify!(tm)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).tm_sec) as usize - ptr as usize },
@@ -1489,12 +1531,18 @@ fn bindgen_test_layout_itimerspec() {
     assert_eq!(
         ::std::mem::size_of::<itimerspec>(),
         32usize,
-        concat!("Size of: ", stringify!(itimerspec))
+        concat!(
+            "Size of: ",
+            stringify!(itimerspec)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<itimerspec>(),
         8usize,
-        concat!("Alignment of ", stringify!(itimerspec))
+        concat!(
+            "Alignment of ",
+            stringify!(itimerspec)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).it_interval) as usize - ptr as usize },
@@ -1646,46 +1694,91 @@ fn bindgen_test_layout__GFloatIEEE754__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_GFloatIEEE754__bindgen_ty_1>(),
         4usize,
-        concat!("Size of: ", stringify!(_GFloatIEEE754__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_GFloatIEEE754__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFloatIEEE754__bindgen_ty_1>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GFloatIEEE754__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFloatIEEE754__bindgen_ty_1)
+        )
     );
 }
 impl _GFloatIEEE754__bindgen_ty_1 {
     #[inline]
     pub fn mantissa(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 23u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        23u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_mantissa(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 23u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    23u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn biased_exponent(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(23usize, 8u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        23usize,
+                        8u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_biased_exponent(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(23usize, 8u8, val as u64)
+            self._bitfield_1
+                .set(
+                    23usize,
+                    8u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn sign(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        31usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_sign(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(31usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    31usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -1695,18 +1788,30 @@ impl _GFloatIEEE754__bindgen_ty_1 {
         sign: guint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 23u8, {
-            let mantissa: u32 = unsafe { ::std::mem::transmute(mantissa) };
-            mantissa as u64
-        });
-        __bindgen_bitfield_unit.set(23usize, 8u8, {
-            let biased_exponent: u32 = unsafe { ::std::mem::transmute(biased_exponent) };
-            biased_exponent as u64
-        });
-        __bindgen_bitfield_unit.set(31usize, 1u8, {
-            let sign: u32 = unsafe { ::std::mem::transmute(sign) };
-            sign as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            23u8,
+            {
+                let mantissa: u32 = unsafe { ::std::mem::transmute(mantissa) };
+                mantissa as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            23usize,
+            8u8,
+            {
+                let biased_exponent: u32 = unsafe { ::std::mem::transmute(biased_exponent) };
+                biased_exponent as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            31usize,
+            1u8,
+            {
+                let sign: u32 = unsafe { ::std::mem::transmute(sign) };
+                sign as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -1717,12 +1822,18 @@ fn bindgen_test_layout__GFloatIEEE754() {
     assert_eq!(
         ::std::mem::size_of::<_GFloatIEEE754>(),
         4usize,
-        concat!("Size of: ", stringify!(_GFloatIEEE754))
+        concat!(
+            "Size of: ",
+            stringify!(_GFloatIEEE754)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFloatIEEE754>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GFloatIEEE754))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFloatIEEE754)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).v_float) as usize - ptr as usize },
@@ -1747,7 +1858,10 @@ fn bindgen_test_layout__GFloatIEEE754() {
 }
 impl ::std::fmt::Debug for _GFloatIEEE754 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GFloatIEEE754 {{ union }}")
+        write!(
+            f,
+            "_GFloatIEEE754 {{ union }}"
+        )
     }
 }
 #[repr(C)]
@@ -1768,57 +1882,115 @@ fn bindgen_test_layout__GDoubleIEEE754__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_GDoubleIEEE754__bindgen_ty_1>(),
         8usize,
-        concat!("Size of: ", stringify!(_GDoubleIEEE754__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_GDoubleIEEE754__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDoubleIEEE754__bindgen_ty_1>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GDoubleIEEE754__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDoubleIEEE754__bindgen_ty_1)
+        )
     );
 }
 impl _GDoubleIEEE754__bindgen_ty_1 {
     #[inline]
     pub fn mantissa_low(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 32u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        32u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_mantissa_low(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 32u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    32u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn mantissa_high(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(32usize, 20u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        32usize,
+                        20u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_mantissa_high(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(32usize, 20u8, val as u64)
+            self._bitfield_1
+                .set(
+                    32usize,
+                    20u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn biased_exponent(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(52usize, 11u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        52usize,
+                        11u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_biased_exponent(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(52usize, 11u8, val as u64)
+            self._bitfield_1
+                .set(
+                    52usize,
+                    11u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn sign(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(63usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        63usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_sign(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(63usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    63usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -1829,22 +2001,38 @@ impl _GDoubleIEEE754__bindgen_ty_1 {
         sign: guint,
     ) -> __BindgenBitfieldUnit<[u8; 8usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 8usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 32u8, {
-            let mantissa_low: u32 = unsafe { ::std::mem::transmute(mantissa_low) };
-            mantissa_low as u64
-        });
-        __bindgen_bitfield_unit.set(32usize, 20u8, {
-            let mantissa_high: u32 = unsafe { ::std::mem::transmute(mantissa_high) };
-            mantissa_high as u64
-        });
-        __bindgen_bitfield_unit.set(52usize, 11u8, {
-            let biased_exponent: u32 = unsafe { ::std::mem::transmute(biased_exponent) };
-            biased_exponent as u64
-        });
-        __bindgen_bitfield_unit.set(63usize, 1u8, {
-            let sign: u32 = unsafe { ::std::mem::transmute(sign) };
-            sign as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            32u8,
+            {
+                let mantissa_low: u32 = unsafe { ::std::mem::transmute(mantissa_low) };
+                mantissa_low as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            32usize,
+            20u8,
+            {
+                let mantissa_high: u32 = unsafe { ::std::mem::transmute(mantissa_high) };
+                mantissa_high as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            52usize,
+            11u8,
+            {
+                let biased_exponent: u32 = unsafe { ::std::mem::transmute(biased_exponent) };
+                biased_exponent as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            63usize,
+            1u8,
+            {
+                let sign: u32 = unsafe { ::std::mem::transmute(sign) };
+                sign as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -1855,12 +2043,18 @@ fn bindgen_test_layout__GDoubleIEEE754() {
     assert_eq!(
         ::std::mem::size_of::<_GDoubleIEEE754>(),
         8usize,
-        concat!("Size of: ", stringify!(_GDoubleIEEE754))
+        concat!(
+            "Size of: ",
+            stringify!(_GDoubleIEEE754)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDoubleIEEE754>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDoubleIEEE754))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDoubleIEEE754)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).v_double) as usize - ptr as usize },
@@ -1885,7 +2079,10 @@ fn bindgen_test_layout__GDoubleIEEE754() {
 }
 impl ::std::fmt::Debug for _GDoubleIEEE754 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GDoubleIEEE754 {{ union }}")
+        write!(
+            f,
+            "_GDoubleIEEE754 {{ union }}"
+        )
     }
 }
 pub type GTimeVal = _GTimeVal;
@@ -1902,12 +2099,18 @@ fn bindgen_test_layout__GTimeVal() {
     assert_eq!(
         ::std::mem::size_of::<_GTimeVal>(),
         16usize,
-        concat!("Size of: ", stringify!(_GTimeVal))
+        concat!(
+            "Size of: ",
+            stringify!(_GTimeVal)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTimeVal>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTimeVal))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTimeVal)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
@@ -2254,12 +2457,18 @@ fn bindgen_test_layout__GArray() {
     assert_eq!(
         ::std::mem::size_of::<_GArray>(),
         16usize,
-        concat!("Size of: ", stringify!(_GArray))
+        concat!(
+            "Size of: ",
+            stringify!(_GArray)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GArray>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GArray))
+        concat!(
+            "Alignment of ",
+            stringify!(_GArray)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -2295,12 +2504,18 @@ fn bindgen_test_layout__GByteArray() {
     assert_eq!(
         ::std::mem::size_of::<_GByteArray>(),
         16usize,
-        concat!("Size of: ", stringify!(_GByteArray))
+        concat!(
+            "Size of: ",
+            stringify!(_GByteArray)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GByteArray>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GByteArray))
+        concat!(
+            "Alignment of ",
+            stringify!(_GByteArray)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -2336,12 +2551,18 @@ fn bindgen_test_layout__GPtrArray() {
     assert_eq!(
         ::std::mem::size_of::<_GPtrArray>(),
         16usize,
-        concat!("Size of: ", stringify!(_GPtrArray))
+        concat!(
+            "Size of: ",
+            stringify!(_GPtrArray)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPtrArray>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPtrArray))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPtrArray)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).pdata) as usize - ptr as usize },
@@ -2804,12 +3025,18 @@ fn bindgen_test_layout__GError() {
     assert_eq!(
         ::std::mem::size_of::<_GError>(),
         16usize,
-        concat!("Size of: ", stringify!(_GError))
+        concat!(
+            "Size of: ",
+            stringify!(_GError)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GError>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GError))
+        concat!(
+            "Alignment of ",
+            stringify!(_GError)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).domain) as usize - ptr as usize },
@@ -3005,12 +3232,18 @@ fn bindgen_test_layout__GDebugKey() {
     assert_eq!(
         ::std::mem::size_of::<_GDebugKey>(),
         16usize,
-        concat!("Size of: ", stringify!(_GDebugKey))
+        concat!(
+            "Size of: ",
+            stringify!(_GDebugKey)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDebugKey>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDebugKey))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDebugKey)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).key) as usize - ptr as usize },
@@ -3249,12 +3482,18 @@ fn bindgen_test_layout_div_t() {
     assert_eq!(
         ::std::mem::size_of::<div_t>(),
         8usize,
-        concat!("Size of: ", stringify!(div_t))
+        concat!(
+            "Size of: ",
+            stringify!(div_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<div_t>(),
         4usize,
-        concat!("Alignment of ", stringify!(div_t))
+        concat!(
+            "Alignment of ",
+            stringify!(div_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
@@ -3290,12 +3529,18 @@ fn bindgen_test_layout_ldiv_t() {
     assert_eq!(
         ::std::mem::size_of::<ldiv_t>(),
         16usize,
-        concat!("Size of: ", stringify!(ldiv_t))
+        concat!(
+            "Size of: ",
+            stringify!(ldiv_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<ldiv_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(ldiv_t))
+        concat!(
+            "Alignment of ",
+            stringify!(ldiv_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
@@ -3331,12 +3576,18 @@ fn bindgen_test_layout_lldiv_t() {
     assert_eq!(
         ::std::mem::size_of::<lldiv_t>(),
         16usize,
-        concat!("Size of: ", stringify!(lldiv_t))
+        concat!(
+            "Size of: ",
+            stringify!(lldiv_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<lldiv_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(lldiv_t))
+        concat!(
+            "Alignment of ",
+            stringify!(lldiv_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).quot) as usize - ptr as usize },
@@ -3592,12 +3843,18 @@ fn bindgen_test_layout__GMutex() {
     assert_eq!(
         ::std::mem::size_of::<_GMutex>(),
         8usize,
-        concat!("Size of: ", stringify!(_GMutex))
+        concat!(
+            "Size of: ",
+            stringify!(_GMutex)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMutex>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMutex))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMutex)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).p) as usize - ptr as usize },
@@ -3622,7 +3879,10 @@ fn bindgen_test_layout__GMutex() {
 }
 impl ::std::fmt::Debug for _GMutex {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GMutex {{ union }}")
+        write!(
+            f,
+            "_GMutex {{ union }}"
+        )
     }
 }
 #[repr(C)]
@@ -3638,12 +3898,18 @@ fn bindgen_test_layout__GRWLock() {
     assert_eq!(
         ::std::mem::size_of::<_GRWLock>(),
         16usize,
-        concat!("Size of: ", stringify!(_GRWLock))
+        concat!(
+            "Size of: ",
+            stringify!(_GRWLock)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GRWLock>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GRWLock))
+        concat!(
+            "Alignment of ",
+            stringify!(_GRWLock)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).p) as usize - ptr as usize },
@@ -3679,22 +3945,38 @@ fn bindgen_test_layout__GCond() {
     assert_eq!(
         ::std::mem::size_of::<_GCond>(),
         16usize,
-        concat!("Size of: ", stringify!(_GCond))
+        concat!(
+            "Size of: ",
+            stringify!(_GCond)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GCond>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GCond))
+        concat!(
+            "Alignment of ",
+            stringify!(_GCond)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).p) as usize - ptr as usize },
         0usize,
-        concat!("Offset of field: ", stringify!(_GCond), "::", stringify!(p))
+        concat!(
+            "Offset of field: ",
+            stringify!(_GCond),
+            "::",
+            stringify!(p)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).i) as usize - ptr as usize },
         8usize,
-        concat!("Offset of field: ", stringify!(_GCond), "::", stringify!(i))
+        concat!(
+            "Offset of field: ",
+            stringify!(_GCond),
+            "::",
+            stringify!(i)
+        )
     );
 }
 #[repr(C)]
@@ -3710,12 +3992,18 @@ fn bindgen_test_layout__GRecMutex() {
     assert_eq!(
         ::std::mem::size_of::<_GRecMutex>(),
         16usize,
-        concat!("Size of: ", stringify!(_GRecMutex))
+        concat!(
+            "Size of: ",
+            stringify!(_GRecMutex)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GRecMutex>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GRecMutex))
+        concat!(
+            "Alignment of ",
+            stringify!(_GRecMutex)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).p) as usize - ptr as usize },
@@ -3752,12 +4040,18 @@ fn bindgen_test_layout__GPrivate() {
     assert_eq!(
         ::std::mem::size_of::<_GPrivate>(),
         32usize,
-        concat!("Size of: ", stringify!(_GPrivate))
+        concat!(
+            "Size of: ",
+            stringify!(_GPrivate)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPrivate>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPrivate))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPrivate)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).p) as usize - ptr as usize },
@@ -3807,12 +4101,18 @@ fn bindgen_test_layout__GOnce() {
     assert_eq!(
         ::std::mem::size_of::<_GOnce>(),
         16usize,
-        concat!("Size of: ", stringify!(_GOnce))
+        concat!(
+            "Size of: ",
+            stringify!(_GOnce)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GOnce>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GOnce))
+        concat!(
+            "Alignment of ",
+            stringify!(_GOnce)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).status) as usize - ptr as usize },
@@ -4090,12 +4390,18 @@ fn bindgen_test_layout___sigset_t() {
     assert_eq!(
         ::std::mem::size_of::<__sigset_t>(),
         128usize,
-        concat!("Size of: ", stringify!(__sigset_t))
+        concat!(
+            "Size of: ",
+            stringify!(__sigset_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<__sigset_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(__sigset_t))
+        concat!(
+            "Alignment of ",
+            stringify!(__sigset_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__bits) as usize - ptr as usize },
@@ -4129,12 +4435,18 @@ fn bindgen_test_layout_pthread_attr_t__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<pthread_attr_t__bindgen_ty_1>(),
         56usize,
-        concat!("Size of: ", stringify!(pthread_attr_t__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_attr_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_attr_t__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_attr_t__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_attr_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__i) as usize - ptr as usize },
@@ -4169,7 +4481,10 @@ fn bindgen_test_layout_pthread_attr_t__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for pthread_attr_t__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_attr_t__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "pthread_attr_t__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -4179,12 +4494,18 @@ fn bindgen_test_layout_pthread_attr_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_attr_t>(),
         56usize,
-        concat!("Size of: ", stringify!(pthread_attr_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_attr_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_attr_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_attr_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_attr_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__u) as usize - ptr as usize },
@@ -4199,7 +4520,11 @@ fn bindgen_test_layout_pthread_attr_t() {
 }
 impl ::std::fmt::Debug for pthread_attr_t {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_attr_t {{ __u: {:?} }}", self.__u)
+        write!(
+            f,
+            "pthread_attr_t {{ __u: {:?} }}",
+            self.__u
+        )
     }
 }
 pub type stack_t = sigaltstack;
@@ -4235,12 +4560,18 @@ fn bindgen_test_layout__fpstate__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_fpstate__bindgen_ty_1>(),
         16usize,
-        concat!("Size of: ", stringify!(_fpstate__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_fpstate__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_fpstate__bindgen_ty_1>(),
         2usize,
-        concat!("Alignment of ", stringify!(_fpstate__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_fpstate__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).significand) as usize - ptr as usize },
@@ -4286,12 +4617,18 @@ fn bindgen_test_layout__fpstate__bindgen_ty_2() {
     assert_eq!(
         ::std::mem::size_of::<_fpstate__bindgen_ty_2>(),
         16usize,
-        concat!("Size of: ", stringify!(_fpstate__bindgen_ty_2))
+        concat!(
+            "Size of: ",
+            stringify!(_fpstate__bindgen_ty_2)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_fpstate__bindgen_ty_2>(),
         4usize,
-        concat!("Alignment of ", stringify!(_fpstate__bindgen_ty_2))
+        concat!(
+            "Alignment of ",
+            stringify!(_fpstate__bindgen_ty_2)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).element) as usize - ptr as usize },
@@ -4311,12 +4648,18 @@ fn bindgen_test_layout__fpstate() {
     assert_eq!(
         ::std::mem::size_of::<_fpstate>(),
         512usize,
-        concat!("Size of: ", stringify!(_fpstate))
+        concat!(
+            "Size of: ",
+            stringify!(_fpstate)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_fpstate>(),
         8usize,
-        concat!("Alignment of ", stringify!(_fpstate))
+        concat!(
+            "Alignment of ",
+            stringify!(_fpstate)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).cwd) as usize - ptr as usize },
@@ -4469,12 +4812,18 @@ fn bindgen_test_layout_sigcontext() {
     assert_eq!(
         ::std::mem::size_of::<sigcontext>(),
         256usize,
-        concat!("Size of: ", stringify!(sigcontext))
+        concat!(
+            "Size of: ",
+            stringify!(sigcontext)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigcontext>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigcontext))
+        concat!(
+            "Alignment of ",
+            stringify!(sigcontext)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).r8) as usize - ptr as usize },
@@ -4771,12 +5120,18 @@ fn bindgen_test_layout_mcontext_t() {
     assert_eq!(
         ::std::mem::size_of::<mcontext_t>(),
         256usize,
-        concat!("Size of: ", stringify!(mcontext_t))
+        concat!(
+            "Size of: ",
+            stringify!(mcontext_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<mcontext_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(mcontext_t))
+        concat!(
+            "Alignment of ",
+            stringify!(mcontext_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).gregs) as usize - ptr as usize },
@@ -4823,12 +5178,18 @@ fn bindgen_test_layout_sigaltstack() {
     assert_eq!(
         ::std::mem::size_of::<sigaltstack>(),
         24usize,
-        concat!("Size of: ", stringify!(sigaltstack))
+        concat!(
+            "Size of: ",
+            stringify!(sigaltstack)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigaltstack>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigaltstack))
+        concat!(
+            "Alignment of ",
+            stringify!(sigaltstack)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ss_sp) as usize - ptr as usize },
@@ -4878,12 +5239,18 @@ fn bindgen_test_layout___ucontext() {
     assert_eq!(
         ::std::mem::size_of::<__ucontext>(),
         936usize,
-        concat!("Size of: ", stringify!(__ucontext))
+        concat!(
+            "Size of: ",
+            stringify!(__ucontext)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<__ucontext>(),
         8usize,
-        concat!("Alignment of ", stringify!(__ucontext))
+        concat!(
+            "Alignment of ",
+            stringify!(__ucontext)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).uc_flags) as usize - ptr as usize },
@@ -4960,12 +5327,18 @@ fn bindgen_test_layout_sigval() {
     assert_eq!(
         ::std::mem::size_of::<sigval>(),
         8usize,
-        concat!("Size of: ", stringify!(sigval))
+        concat!(
+            "Size of: ",
+            stringify!(sigval)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigval>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigval))
+        concat!(
+            "Alignment of ",
+            stringify!(sigval)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).sival_int) as usize - ptr as usize },
@@ -4990,7 +5363,10 @@ fn bindgen_test_layout_sigval() {
 }
 impl ::std::fmt::Debug for sigval {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "sigval {{ union }}")
+        write!(
+            f,
+            "sigval {{ union }}"
+        )
     }
 }
 #[repr(C)]
@@ -5621,12 +5997,18 @@ fn bindgen_test_layout_siginfo_t__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<siginfo_t__bindgen_ty_1>(),
         112usize,
-        concat!("Size of: ", stringify!(siginfo_t__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(siginfo_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<siginfo_t__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(siginfo_t__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(siginfo_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__pad) as usize - ptr as usize },
@@ -5681,7 +6063,10 @@ fn bindgen_test_layout_siginfo_t__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for siginfo_t__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "siginfo_t__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "siginfo_t__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -5691,12 +6076,18 @@ fn bindgen_test_layout_siginfo_t() {
     assert_eq!(
         ::std::mem::size_of::<siginfo_t>(),
         128usize,
-        concat!("Size of: ", stringify!(siginfo_t))
+        concat!(
+            "Size of: ",
+            stringify!(siginfo_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<siginfo_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(siginfo_t))
+        concat!(
+            "Alignment of ",
+            stringify!(siginfo_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).si_signo) as usize - ptr as usize },
@@ -5776,12 +6167,18 @@ fn bindgen_test_layout_sigaction__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<sigaction__bindgen_ty_1>(),
         8usize,
-        concat!("Size of: ", stringify!(sigaction__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(sigaction__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigaction__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigaction__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(sigaction__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).sa_handler) as usize - ptr as usize },
@@ -5806,7 +6203,10 @@ fn bindgen_test_layout_sigaction__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for sigaction__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "sigaction__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "sigaction__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -5816,12 +6216,18 @@ fn bindgen_test_layout_sigaction() {
     assert_eq!(
         ::std::mem::size_of::<sigaction>(),
         152usize,
-        concat!("Size of: ", stringify!(sigaction))
+        concat!(
+            "Size of: ",
+            stringify!(sigaction)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigaction>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigaction))
+        concat!(
+            "Alignment of ",
+            stringify!(sigaction)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__sa_handler) as usize - ptr as usize },
@@ -5944,12 +6350,18 @@ fn bindgen_test_layout_sigevent__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<sigevent__bindgen_ty_1>(),
         48usize,
-        concat!("Size of: ", stringify!(sigevent__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(sigevent__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigevent__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigevent__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(sigevent__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__pad) as usize - ptr as usize },
@@ -5984,7 +6396,10 @@ fn bindgen_test_layout_sigevent__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for sigevent__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "sigevent__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "sigevent__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -5994,12 +6409,18 @@ fn bindgen_test_layout_sigevent() {
     assert_eq!(
         ::std::mem::size_of::<sigevent>(),
         64usize,
-        concat!("Size of: ", stringify!(sigevent))
+        concat!(
+            "Size of: ",
+            stringify!(sigevent)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sigevent>(),
         8usize,
-        concat!("Alignment of ", stringify!(sigevent))
+        concat!(
+            "Alignment of ",
+            stringify!(sigevent)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).sigev_value) as usize - ptr as usize },
@@ -7259,79 +7680,163 @@ fn bindgen_test_layout__GDate() {
     assert_eq!(
         ::std::mem::size_of::<_GDate>(),
         8usize,
-        concat!("Size of: ", stringify!(_GDate))
+        concat!(
+            "Size of: ",
+            stringify!(_GDate)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDate>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GDate))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDate)
+        )
     );
 }
 impl _GDate {
     #[inline]
     pub fn julian_days(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 32u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        32u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_julian_days(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 32u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    32u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn julian(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(32usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        32usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_julian(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(32usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    32usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn dmy(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(33usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        33usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_dmy(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(33usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    33usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn day(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(34usize, 6u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        34usize,
+                        6u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_day(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(34usize, 6u8, val as u64)
+            self._bitfield_1
+                .set(
+                    34usize,
+                    6u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn month(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(40usize, 4u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        40usize,
+                        4u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_month(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(40usize, 4u8, val as u64)
+            self._bitfield_1
+                .set(
+                    40usize,
+                    4u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn year(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(44usize, 16u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        44usize,
+                        16u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_year(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(44usize, 16u8, val as u64)
+            self._bitfield_1
+                .set(
+                    44usize,
+                    16u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -7344,30 +7849,54 @@ impl _GDate {
         year: guint,
     ) -> __BindgenBitfieldUnit<[u8; 8usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 8usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 32u8, {
-            let julian_days: u32 = unsafe { ::std::mem::transmute(julian_days) };
-            julian_days as u64
-        });
-        __bindgen_bitfield_unit.set(32usize, 1u8, {
-            let julian: u32 = unsafe { ::std::mem::transmute(julian) };
-            julian as u64
-        });
-        __bindgen_bitfield_unit.set(33usize, 1u8, {
-            let dmy: u32 = unsafe { ::std::mem::transmute(dmy) };
-            dmy as u64
-        });
-        __bindgen_bitfield_unit.set(34usize, 6u8, {
-            let day: u32 = unsafe { ::std::mem::transmute(day) };
-            day as u64
-        });
-        __bindgen_bitfield_unit.set(40usize, 4u8, {
-            let month: u32 = unsafe { ::std::mem::transmute(month) };
-            month as u64
-        });
-        __bindgen_bitfield_unit.set(44usize, 16u8, {
-            let year: u32 = unsafe { ::std::mem::transmute(year) };
-            year as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            32u8,
+            {
+                let julian_days: u32 = unsafe { ::std::mem::transmute(julian_days) };
+                julian_days as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            32usize,
+            1u8,
+            {
+                let julian: u32 = unsafe { ::std::mem::transmute(julian) };
+                julian as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            33usize,
+            1u8,
+            {
+                let dmy: u32 = unsafe { ::std::mem::transmute(dmy) };
+                dmy as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            34usize,
+            6u8,
+            {
+                let day: u32 = unsafe { ::std::mem::transmute(day) };
+                day as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            40usize,
+            4u8,
+            {
+                let month: u32 = unsafe { ::std::mem::transmute(month) };
+                month as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            44usize,
+            16u8,
+            {
+                let year: u32 = unsafe { ::std::mem::transmute(year) };
+                year as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -7541,12 +8070,18 @@ fn bindgen_test_layout_dirent() {
     assert_eq!(
         ::std::mem::size_of::<dirent>(),
         280usize,
-        concat!("Size of: ", stringify!(dirent))
+        concat!(
+            "Size of: ",
+            stringify!(dirent)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<dirent>(),
         8usize,
-        concat!("Alignment of ", stringify!(dirent))
+        concat!(
+            "Alignment of ",
+            stringify!(dirent)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).d_ino) as usize - ptr as usize },
@@ -7955,12 +8490,18 @@ fn bindgen_test_layout__GMemVTable() {
     assert_eq!(
         ::std::mem::size_of::<_GMemVTable>(),
         48usize,
-        concat!("Size of: ", stringify!(_GMemVTable))
+        concat!(
+            "Size of: ",
+            stringify!(_GMemVTable)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMemVTable>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMemVTable))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMemVTable)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).malloc) as usize - ptr as usize },
@@ -8071,12 +8612,18 @@ fn bindgen_test_layout__GNode() {
     assert_eq!(
         ::std::mem::size_of::<_GNode>(),
         40usize,
-        concat!("Size of: ", stringify!(_GNode))
+        concat!(
+            "Size of: ",
+            stringify!(_GNode)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNode>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNode))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNode)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -8248,12 +8795,18 @@ fn bindgen_test_layout__GList() {
     assert_eq!(
         ::std::mem::size_of::<_GList>(),
         24usize,
-        concat!("Size of: ", stringify!(_GList))
+        concat!(
+            "Size of: ",
+            stringify!(_GList)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GList>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GList))
+        concat!(
+            "Alignment of ",
+            stringify!(_GList)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -8434,12 +8987,18 @@ fn bindgen_test_layout__GHashTableIter() {
     assert_eq!(
         ::std::mem::size_of::<_GHashTableIter>(),
         40usize,
-        concat!("Size of: ", stringify!(_GHashTableIter))
+        concat!(
+            "Size of: ",
+            stringify!(_GHashTableIter)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GHashTableIter>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GHashTableIter))
+        concat!(
+            "Alignment of ",
+            stringify!(_GHashTableIter)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).dummy1) as usize - ptr as usize },
@@ -8769,12 +9328,18 @@ fn bindgen_test_layout__GHookList() {
     assert_eq!(
         ::std::mem::size_of::<_GHookList>(),
         56usize,
-        concat!("Size of: ", stringify!(_GHookList))
+        concat!(
+            "Size of: ",
+            stringify!(_GHookList)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GHookList>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GHookList))
+        concat!(
+            "Alignment of ",
+            stringify!(_GHookList)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).seq_id) as usize - ptr as usize },
@@ -8830,24 +9395,50 @@ fn bindgen_test_layout__GHookList() {
 impl _GHookList {
     #[inline]
     pub fn hook_size(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 16u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        16u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_hook_size(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 16u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    16u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn is_setup(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        16usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_is_setup(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(16usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    16usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -8856,14 +9447,22 @@ impl _GHookList {
         is_setup: guint,
     ) -> __BindgenBitfieldUnit<[u8; 3usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 16u8, {
-            let hook_size: u32 = unsafe { ::std::mem::transmute(hook_size) };
-            hook_size as u64
-        });
-        __bindgen_bitfield_unit.set(16usize, 1u8, {
-            let is_setup: u32 = unsafe { ::std::mem::transmute(is_setup) };
-            is_setup as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            16u8,
+            {
+                let hook_size: u32 = unsafe { ::std::mem::transmute(hook_size) };
+                hook_size as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            16usize,
+            1u8,
+            {
+                let is_setup: u32 = unsafe { ::std::mem::transmute(is_setup) };
+                is_setup as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -8886,12 +9485,18 @@ fn bindgen_test_layout__GHook() {
     assert_eq!(
         ::std::mem::size_of::<_GHook>(),
         64usize,
-        concat!("Size of: ", stringify!(_GHook))
+        concat!(
+            "Size of: ",
+            stringify!(_GHook)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GHook>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GHook))
+        concat!(
+            "Alignment of ",
+            stringify!(_GHook)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -9112,12 +9717,18 @@ fn bindgen_test_layout__GPollFD() {
     assert_eq!(
         ::std::mem::size_of::<_GPollFD>(),
         8usize,
-        concat!("Size of: ", stringify!(_GPollFD))
+        concat!(
+            "Size of: ",
+            stringify!(_GPollFD)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPollFD>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GPollFD))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPollFD)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).fd) as usize - ptr as usize },
@@ -9167,12 +9778,18 @@ fn bindgen_test_layout__GSList() {
     assert_eq!(
         ::std::mem::size_of::<_GSList>(),
         16usize,
-        concat!("Size of: ", stringify!(_GSList))
+        concat!(
+            "Size of: ",
+            stringify!(_GSList)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSList>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSList))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSList)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -9370,12 +9987,18 @@ fn bindgen_test_layout__GSource() {
     assert_eq!(
         ::std::mem::size_of::<_GSource>(),
         96usize,
-        concat!("Size of: ", stringify!(_GSource))
+        concat!(
+            "Size of: ",
+            stringify!(_GSource)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSource>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSource))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSource)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).callback_data) as usize - ptr as usize },
@@ -9530,12 +10153,18 @@ fn bindgen_test_layout__GSourceCallbackFuncs() {
     assert_eq!(
         ::std::mem::size_of::<_GSourceCallbackFuncs>(),
         24usize,
-        concat!("Size of: ", stringify!(_GSourceCallbackFuncs))
+        concat!(
+            "Size of: ",
+            stringify!(_GSourceCallbackFuncs)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSourceCallbackFuncs>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSourceCallbackFuncs))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSourceCallbackFuncs)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_) as usize - ptr as usize },
@@ -9594,12 +10223,18 @@ fn bindgen_test_layout__GSourceFuncs() {
     assert_eq!(
         ::std::mem::size_of::<_GSourceFuncs>(),
         48usize,
-        concat!("Size of: ", stringify!(_GSourceFuncs))
+        concat!(
+            "Size of: ",
+            stringify!(_GSourceFuncs)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSourceFuncs>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSourceFuncs))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSourceFuncs)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).prepare) as usize - ptr as usize },
@@ -10789,12 +11424,18 @@ fn bindgen_test_layout__GString() {
     assert_eq!(
         ::std::mem::size_of::<_GString>(),
         24usize,
-        concat!("Size of: ", stringify!(_GString))
+        concat!(
+            "Size of: ",
+            stringify!(_GString)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GString>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GString))
+        concat!(
+            "Alignment of ",
+            stringify!(_GString)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).str_) as usize - ptr as usize },
@@ -11032,12 +11673,18 @@ fn bindgen_test_layout__GIOChannel() {
     assert_eq!(
         ::std::mem::size_of::<_GIOChannel>(),
         112usize,
-        concat!("Size of: ", stringify!(_GIOChannel))
+        concat!(
+            "Size of: ",
+            stringify!(_GIOChannel)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GIOChannel>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GIOChannel))
+        concat!(
+            "Alignment of ",
+            stringify!(_GIOChannel)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -11183,68 +11830,146 @@ fn bindgen_test_layout__GIOChannel() {
 impl _GIOChannel {
     #[inline]
     pub fn use_buffer(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_use_buffer(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn do_encode(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        1usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_do_encode(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    1usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn close_on_unref(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        2usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_close_on_unref(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    2usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn is_readable(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        3usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_is_readable(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(3usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    3usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn is_writeable(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        4usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_is_writeable(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(4usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    4usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn is_seekable(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        5usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_is_seekable(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(5usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    5usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -11257,30 +11982,54 @@ impl _GIOChannel {
         is_seekable: guint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let use_buffer: u32 = unsafe { ::std::mem::transmute(use_buffer) };
-            use_buffer as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let do_encode: u32 = unsafe { ::std::mem::transmute(do_encode) };
-            do_encode as u64
-        });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let close_on_unref: u32 = unsafe { ::std::mem::transmute(close_on_unref) };
-            close_on_unref as u64
-        });
-        __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let is_readable: u32 = unsafe { ::std::mem::transmute(is_readable) };
-            is_readable as u64
-        });
-        __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let is_writeable: u32 = unsafe { ::std::mem::transmute(is_writeable) };
-            is_writeable as u64
-        });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let is_seekable: u32 = unsafe { ::std::mem::transmute(is_seekable) };
-            is_seekable as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            1u8,
+            {
+                let use_buffer: u32 = unsafe { ::std::mem::transmute(use_buffer) };
+                use_buffer as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            1usize,
+            1u8,
+            {
+                let do_encode: u32 = unsafe { ::std::mem::transmute(do_encode) };
+                do_encode as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            2usize,
+            1u8,
+            {
+                let close_on_unref: u32 = unsafe { ::std::mem::transmute(close_on_unref) };
+                close_on_unref as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            3usize,
+            1u8,
+            {
+                let is_readable: u32 = unsafe { ::std::mem::transmute(is_readable) };
+                is_readable as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            4usize,
+            1u8,
+            {
+                let is_writeable: u32 = unsafe { ::std::mem::transmute(is_writeable) };
+                is_writeable as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            5usize,
+            1u8,
+            {
+                let is_seekable: u32 = unsafe { ::std::mem::transmute(is_seekable) };
+                is_seekable as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -11344,12 +12093,18 @@ fn bindgen_test_layout__GIOFuncs() {
     assert_eq!(
         ::std::mem::size_of::<_GIOFuncs>(),
         64usize,
-        concat!("Size of: ", stringify!(_GIOFuncs))
+        concat!(
+            "Size of: ",
+            stringify!(_GIOFuncs)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GIOFuncs>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GIOFuncs))
+        concat!(
+            "Alignment of ",
+            stringify!(_GIOFuncs)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).io_read) as usize - ptr as usize },
@@ -12140,12 +12895,18 @@ fn bindgen_test_layout__GMarkupParser() {
     assert_eq!(
         ::std::mem::size_of::<_GMarkupParser>(),
         40usize,
-        concat!("Size of: ", stringify!(_GMarkupParser))
+        concat!(
+            "Size of: ",
+            stringify!(_GMarkupParser)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMarkupParser>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMarkupParser))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMarkupParser)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).start_element) as usize - ptr as usize },
@@ -12727,12 +13488,18 @@ fn bindgen_test_layout__GVariantIter() {
     assert_eq!(
         ::std::mem::size_of::<_GVariantIter>(),
         128usize,
-        concat!("Size of: ", stringify!(_GVariantIter))
+        concat!(
+            "Size of: ",
+            stringify!(_GVariantIter)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVariantIter>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVariantIter))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVariantIter)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).x) as usize - ptr as usize },
@@ -12856,12 +13623,18 @@ fn bindgen_test_layout__GVariantBuilder__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_GVariantBuilder__bindgen_ty_1>(),
         128usize,
-        concat!("Size of: ", stringify!(_GVariantBuilder__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_GVariantBuilder__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVariantBuilder__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVariantBuilder__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVariantBuilder__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).s) as usize - ptr as usize },
@@ -12886,7 +13659,10 @@ fn bindgen_test_layout__GVariantBuilder__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for _GVariantBuilder__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GVariantBuilder__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "_GVariantBuilder__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -12896,12 +13672,18 @@ fn bindgen_test_layout__GVariantBuilder() {
     assert_eq!(
         ::std::mem::size_of::<_GVariantBuilder>(),
         128usize,
-        concat!("Size of: ", stringify!(_GVariantBuilder))
+        concat!(
+            "Size of: ",
+            stringify!(_GVariantBuilder)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVariantBuilder>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVariantBuilder))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVariantBuilder)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).u) as usize - ptr as usize },
@@ -12916,7 +13698,11 @@ fn bindgen_test_layout__GVariantBuilder() {
 }
 impl ::std::fmt::Debug for _GVariantBuilder {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GVariantBuilder {{ u: {:?} }}", self.u)
+        write!(
+            f,
+            "_GVariantBuilder {{ u: {:?} }}",
+            self.u
+        )
     }
 }
 pub const GVariantParseError_G_VARIANT_PARSE_ERROR_FAILED: GVariantParseError = 0;
@@ -13110,12 +13896,18 @@ fn bindgen_test_layout__GVariantDict__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_GVariantDict__bindgen_ty_1>(),
         128usize,
-        concat!("Size of: ", stringify!(_GVariantDict__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_GVariantDict__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVariantDict__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVariantDict__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVariantDict__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).s) as usize - ptr as usize },
@@ -13140,7 +13932,10 @@ fn bindgen_test_layout__GVariantDict__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for _GVariantDict__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GVariantDict__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "_GVariantDict__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -13150,12 +13945,18 @@ fn bindgen_test_layout__GVariantDict() {
     assert_eq!(
         ::std::mem::size_of::<_GVariantDict>(),
         128usize,
-        concat!("Size of: ", stringify!(_GVariantDict))
+        concat!(
+            "Size of: ",
+            stringify!(_GVariantDict)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVariantDict>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVariantDict))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVariantDict)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).u) as usize - ptr as usize },
@@ -13170,7 +13971,11 @@ fn bindgen_test_layout__GVariantDict() {
 }
 impl ::std::fmt::Debug for _GVariantDict {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GVariantDict {{ u: {:?} }}", self.u)
+        write!(
+            f,
+            "_GVariantDict {{ u: {:?} }}",
+            self.u
+        )
     }
 }
 extern "C" {
@@ -13317,12 +14122,18 @@ fn bindgen_test_layout__GLogField() {
     assert_eq!(
         ::std::mem::size_of::<_GLogField>(),
         24usize,
-        concat!("Size of: ", stringify!(_GLogField))
+        concat!(
+            "Size of: ",
+            stringify!(_GLogField)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GLogField>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GLogField))
+        concat!(
+            "Alignment of ",
+            stringify!(_GLogField)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).key) as usize - ptr as usize },
@@ -13578,12 +14389,18 @@ fn bindgen_test_layout__GOptionEntry() {
     assert_eq!(
         ::std::mem::size_of::<_GOptionEntry>(),
         48usize,
-        concat!("Size of: ", stringify!(_GOptionEntry))
+        concat!(
+            "Size of: ",
+            stringify!(_GOptionEntry)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GOptionEntry>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GOptionEntry))
+        concat!(
+            "Alignment of ",
+            stringify!(_GOptionEntry)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).long_name) as usize - ptr as usize },
@@ -13805,12 +14622,18 @@ fn bindgen_test_layout__GPathBuf() {
     assert_eq!(
         ::std::mem::size_of::<_GPathBuf>(),
         64usize,
-        concat!("Size of: ", stringify!(_GPathBuf))
+        concat!(
+            "Size of: ",
+            stringify!(_GPathBuf)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPathBuf>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPathBuf))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPathBuf)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).dummy) as usize - ptr as usize },
@@ -13950,12 +14773,18 @@ fn bindgen_test_layout__GQueue() {
     assert_eq!(
         ::std::mem::size_of::<_GQueue>(),
         24usize,
-        concat!("Size of: ", stringify!(_GQueue))
+        concat!(
+            "Size of: ",
+            stringify!(_GQueue)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GQueue>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GQueue))
+        concat!(
+            "Alignment of ",
+            stringify!(_GQueue)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).head) as usize - ptr as usize },
@@ -14669,12 +15498,18 @@ fn bindgen_test_layout__GTokenValue() {
     assert_eq!(
         ::std::mem::size_of::<_GTokenValue>(),
         8usize,
-        concat!("Size of: ", stringify!(_GTokenValue))
+        concat!(
+            "Size of: ",
+            stringify!(_GTokenValue)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTokenValue>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTokenValue))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTokenValue)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).v_symbol) as usize - ptr as usize },
@@ -14799,7 +15634,10 @@ fn bindgen_test_layout__GTokenValue() {
 }
 impl ::std::fmt::Debug for _GTokenValue {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GTokenValue {{ union }}")
+        write!(
+            f,
+            "_GTokenValue {{ union }}"
+        )
     }
 }
 #[repr(C)]
@@ -14820,12 +15658,18 @@ fn bindgen_test_layout__GScannerConfig() {
     assert_eq!(
         ::std::mem::size_of::<_GScannerConfig>(),
         40usize,
-        concat!("Size of: ", stringify!(_GScannerConfig))
+        concat!(
+            "Size of: ",
+            stringify!(_GScannerConfig)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GScannerConfig>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GScannerConfig))
+        concat!(
+            "Alignment of ",
+            stringify!(_GScannerConfig)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).cset_skip_characters) as usize - ptr as usize },
@@ -14881,244 +15725,530 @@ fn bindgen_test_layout__GScannerConfig() {
 impl _GScannerConfig {
     #[inline]
     pub fn case_sensitive(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_case_sensitive(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn skip_comment_multi(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        1usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_skip_comment_multi(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    1usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn skip_comment_single(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        2usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_skip_comment_single(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    2usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_comment_multi(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        3usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_comment_multi(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(3usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    3usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_identifier(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        4usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_identifier(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(4usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    4usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_identifier_1char(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        5usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_identifier_1char(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(5usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    5usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_identifier_NULL(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        6usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_identifier_NULL(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(6usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    6usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_symbols(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        7usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_symbols(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(7usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    7usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_binary(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        8usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_binary(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(8usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    8usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_octal(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(9usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        9usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_octal(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(9usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    9usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_float(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        10usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_float(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(10usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    10usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_hex(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(11usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        11usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_hex(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(11usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    11usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_hex_dollar(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        12usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_hex_dollar(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(12usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    12usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_string_sq(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(13usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        13usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_string_sq(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(13usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    13usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scan_string_dq(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(14usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        14usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scan_string_dq(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(14usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    14usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn numbers_2_int(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(15usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        15usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_numbers_2_int(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(15usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    15usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn int_2_float(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        16usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_int_2_float(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(16usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    16usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn identifier_2_string(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(17usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        17usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_identifier_2_string(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(17usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    17usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn char_2_token(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(18usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        18usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_char_2_token(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(18usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    18usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn symbol_2_token(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(19usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        19usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_symbol_2_token(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(19usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    19usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn scope_0_fallback(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(20usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        20usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_scope_0_fallback(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(20usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    20usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn store_int64(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(21usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        21usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_store_int64(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(21usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    21usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -15147,95 +16277,186 @@ impl _GScannerConfig {
         store_int64: guint,
     ) -> __BindgenBitfieldUnit<[u8; 3usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let case_sensitive: u32 = unsafe { ::std::mem::transmute(case_sensitive) };
-            case_sensitive as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let skip_comment_multi: u32 = unsafe { ::std::mem::transmute(skip_comment_multi) };
-            skip_comment_multi as u64
-        });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let skip_comment_single: u32 = unsafe { ::std::mem::transmute(skip_comment_single) };
-            skip_comment_single as u64
-        });
-        __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let scan_comment_multi: u32 = unsafe { ::std::mem::transmute(scan_comment_multi) };
-            scan_comment_multi as u64
-        });
-        __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let scan_identifier: u32 = unsafe { ::std::mem::transmute(scan_identifier) };
-            scan_identifier as u64
-        });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let scan_identifier_1char: u32 =
-                unsafe { ::std::mem::transmute(scan_identifier_1char) };
-            scan_identifier_1char as u64
-        });
-        __bindgen_bitfield_unit.set(6usize, 1u8, {
-            let scan_identifier_NULL: u32 = unsafe { ::std::mem::transmute(scan_identifier_NULL) };
-            scan_identifier_NULL as u64
-        });
-        __bindgen_bitfield_unit.set(7usize, 1u8, {
-            let scan_symbols: u32 = unsafe { ::std::mem::transmute(scan_symbols) };
-            scan_symbols as u64
-        });
-        __bindgen_bitfield_unit.set(8usize, 1u8, {
-            let scan_binary: u32 = unsafe { ::std::mem::transmute(scan_binary) };
-            scan_binary as u64
-        });
-        __bindgen_bitfield_unit.set(9usize, 1u8, {
-            let scan_octal: u32 = unsafe { ::std::mem::transmute(scan_octal) };
-            scan_octal as u64
-        });
-        __bindgen_bitfield_unit.set(10usize, 1u8, {
-            let scan_float: u32 = unsafe { ::std::mem::transmute(scan_float) };
-            scan_float as u64
-        });
-        __bindgen_bitfield_unit.set(11usize, 1u8, {
-            let scan_hex: u32 = unsafe { ::std::mem::transmute(scan_hex) };
-            scan_hex as u64
-        });
-        __bindgen_bitfield_unit.set(12usize, 1u8, {
-            let scan_hex_dollar: u32 = unsafe { ::std::mem::transmute(scan_hex_dollar) };
-            scan_hex_dollar as u64
-        });
-        __bindgen_bitfield_unit.set(13usize, 1u8, {
-            let scan_string_sq: u32 = unsafe { ::std::mem::transmute(scan_string_sq) };
-            scan_string_sq as u64
-        });
-        __bindgen_bitfield_unit.set(14usize, 1u8, {
-            let scan_string_dq: u32 = unsafe { ::std::mem::transmute(scan_string_dq) };
-            scan_string_dq as u64
-        });
-        __bindgen_bitfield_unit.set(15usize, 1u8, {
-            let numbers_2_int: u32 = unsafe { ::std::mem::transmute(numbers_2_int) };
-            numbers_2_int as u64
-        });
-        __bindgen_bitfield_unit.set(16usize, 1u8, {
-            let int_2_float: u32 = unsafe { ::std::mem::transmute(int_2_float) };
-            int_2_float as u64
-        });
-        __bindgen_bitfield_unit.set(17usize, 1u8, {
-            let identifier_2_string: u32 = unsafe { ::std::mem::transmute(identifier_2_string) };
-            identifier_2_string as u64
-        });
-        __bindgen_bitfield_unit.set(18usize, 1u8, {
-            let char_2_token: u32 = unsafe { ::std::mem::transmute(char_2_token) };
-            char_2_token as u64
-        });
-        __bindgen_bitfield_unit.set(19usize, 1u8, {
-            let symbol_2_token: u32 = unsafe { ::std::mem::transmute(symbol_2_token) };
-            symbol_2_token as u64
-        });
-        __bindgen_bitfield_unit.set(20usize, 1u8, {
-            let scope_0_fallback: u32 = unsafe { ::std::mem::transmute(scope_0_fallback) };
-            scope_0_fallback as u64
-        });
-        __bindgen_bitfield_unit.set(21usize, 1u8, {
-            let store_int64: u32 = unsafe { ::std::mem::transmute(store_int64) };
-            store_int64 as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            1u8,
+            {
+                let case_sensitive: u32 = unsafe { ::std::mem::transmute(case_sensitive) };
+                case_sensitive as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            1usize,
+            1u8,
+            {
+                let skip_comment_multi: u32 = unsafe { ::std::mem::transmute(skip_comment_multi) };
+                skip_comment_multi as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            2usize,
+            1u8,
+            {
+                let skip_comment_single: u32 =
+                    unsafe { ::std::mem::transmute(skip_comment_single) };
+                skip_comment_single as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            3usize,
+            1u8,
+            {
+                let scan_comment_multi: u32 = unsafe { ::std::mem::transmute(scan_comment_multi) };
+                scan_comment_multi as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            4usize,
+            1u8,
+            {
+                let scan_identifier: u32 = unsafe { ::std::mem::transmute(scan_identifier) };
+                scan_identifier as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            5usize,
+            1u8,
+            {
+                let scan_identifier_1char: u32 =
+                    unsafe { ::std::mem::transmute(scan_identifier_1char) };
+                scan_identifier_1char as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            6usize,
+            1u8,
+            {
+                let scan_identifier_NULL: u32 =
+                    unsafe { ::std::mem::transmute(scan_identifier_NULL) };
+                scan_identifier_NULL as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            7usize,
+            1u8,
+            {
+                let scan_symbols: u32 = unsafe { ::std::mem::transmute(scan_symbols) };
+                scan_symbols as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            8usize,
+            1u8,
+            {
+                let scan_binary: u32 = unsafe { ::std::mem::transmute(scan_binary) };
+                scan_binary as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            9usize,
+            1u8,
+            {
+                let scan_octal: u32 = unsafe { ::std::mem::transmute(scan_octal) };
+                scan_octal as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            10usize,
+            1u8,
+            {
+                let scan_float: u32 = unsafe { ::std::mem::transmute(scan_float) };
+                scan_float as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            11usize,
+            1u8,
+            {
+                let scan_hex: u32 = unsafe { ::std::mem::transmute(scan_hex) };
+                scan_hex as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            12usize,
+            1u8,
+            {
+                let scan_hex_dollar: u32 = unsafe { ::std::mem::transmute(scan_hex_dollar) };
+                scan_hex_dollar as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            13usize,
+            1u8,
+            {
+                let scan_string_sq: u32 = unsafe { ::std::mem::transmute(scan_string_sq) };
+                scan_string_sq as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            14usize,
+            1u8,
+            {
+                let scan_string_dq: u32 = unsafe { ::std::mem::transmute(scan_string_dq) };
+                scan_string_dq as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            15usize,
+            1u8,
+            {
+                let numbers_2_int: u32 = unsafe { ::std::mem::transmute(numbers_2_int) };
+                numbers_2_int as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            16usize,
+            1u8,
+            {
+                let int_2_float: u32 = unsafe { ::std::mem::transmute(int_2_float) };
+                int_2_float as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            17usize,
+            1u8,
+            {
+                let identifier_2_string: u32 =
+                    unsafe { ::std::mem::transmute(identifier_2_string) };
+                identifier_2_string as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            18usize,
+            1u8,
+            {
+                let char_2_token: u32 = unsafe { ::std::mem::transmute(char_2_token) };
+                char_2_token as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            19usize,
+            1u8,
+            {
+                let symbol_2_token: u32 = unsafe { ::std::mem::transmute(symbol_2_token) };
+                symbol_2_token as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            20usize,
+            1u8,
+            {
+                let scope_0_fallback: u32 = unsafe { ::std::mem::transmute(scope_0_fallback) };
+                scope_0_fallback as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            21usize,
+            1u8,
+            {
+                let store_int64: u32 = unsafe { ::std::mem::transmute(store_int64) };
+                store_int64 as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -15271,12 +16492,18 @@ fn bindgen_test_layout__GScanner() {
     assert_eq!(
         ::std::mem::size_of::<_GScanner>(),
         144usize,
-        concat!("Size of: ", stringify!(_GScanner))
+        concat!(
+            "Size of: ",
+            stringify!(_GScanner)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GScanner>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GScanner))
+        concat!(
+            "Alignment of ",
+            stringify!(_GScanner)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).user_data) as usize - ptr as usize },
@@ -16327,12 +17554,18 @@ fn bindgen_test_layout_GTestConfig() {
     assert_eq!(
         ::std::mem::size_of::<GTestConfig>(),
         24usize,
-        concat!("Size of: ", stringify!(GTestConfig))
+        concat!(
+            "Size of: ",
+            stringify!(GTestConfig)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GTestConfig>(),
         4usize,
-        concat!("Alignment of ", stringify!(GTestConfig))
+        concat!(
+            "Alignment of ",
+            stringify!(GTestConfig)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).test_initialized) as usize - ptr as usize },
@@ -16432,12 +17665,18 @@ fn bindgen_test_layout_GTestLogMsg() {
     assert_eq!(
         ::std::mem::size_of::<GTestLogMsg>(),
         32usize,
-        concat!("Size of: ", stringify!(GTestLogMsg))
+        concat!(
+            "Size of: ",
+            stringify!(GTestLogMsg)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GTestLogMsg>(),
         8usize,
-        concat!("Alignment of ", stringify!(GTestLogMsg))
+        concat!(
+            "Alignment of ",
+            stringify!(GTestLogMsg)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).log_type) as usize - ptr as usize },
@@ -16503,12 +17742,18 @@ fn bindgen_test_layout_GTestLogBuffer() {
     assert_eq!(
         ::std::mem::size_of::<GTestLogBuffer>(),
         16usize,
-        concat!("Size of: ", stringify!(GTestLogBuffer))
+        concat!(
+            "Size of: ",
+            stringify!(GTestLogBuffer)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GTestLogBuffer>(),
         8usize,
-        concat!("Alignment of ", stringify!(GTestLogBuffer))
+        concat!(
+            "Alignment of ",
+            stringify!(GTestLogBuffer)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -16614,12 +17859,18 @@ fn bindgen_test_layout__GThreadPool() {
     assert_eq!(
         ::std::mem::size_of::<_GThreadPool>(),
         24usize,
-        concat!("Size of: ", stringify!(_GThreadPool))
+        concat!(
+            "Size of: ",
+            stringify!(_GThreadPool)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GThreadPool>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GThreadPool))
+        concat!(
+            "Alignment of ",
+            stringify!(_GThreadPool)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).func) as usize - ptr as usize },
@@ -16780,12 +18031,18 @@ fn bindgen_test_layout__GTrashStack() {
     assert_eq!(
         ::std::mem::size_of::<_GTrashStack>(),
         8usize,
-        concat!("Size of: ", stringify!(_GTrashStack))
+        concat!(
+            "Size of: ",
+            stringify!(_GTrashStack)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTrashStack>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTrashStack))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTrashStack)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).next) as usize - ptr as usize },
@@ -17170,12 +18427,18 @@ fn bindgen_test_layout__GUriParamsIter() {
     assert_eq!(
         ::std::mem::size_of::<_GUriParamsIter>(),
         280usize,
-        concat!("Size of: ", stringify!(_GUriParamsIter))
+        concat!(
+            "Size of: ",
+            stringify!(_GUriParamsIter)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUriParamsIter>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUriParamsIter))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUriParamsIter)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).dummy0) as usize - ptr as usize },
@@ -17446,12 +18709,18 @@ fn bindgen_test_layout__GCompletion() {
     assert_eq!(
         ::std::mem::size_of::<_GCompletion>(),
         40usize,
-        concat!("Size of: ", stringify!(_GCompletion))
+        concat!(
+            "Size of: ",
+            stringify!(_GCompletion)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GCompletion>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GCompletion))
+        concat!(
+            "Alignment of ",
+            stringify!(_GCompletion)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).items) as usize - ptr as usize },
@@ -17555,12 +18824,18 @@ fn bindgen_test_layout__GTuples() {
     assert_eq!(
         ::std::mem::size_of::<_GTuples>(),
         4usize,
-        concat!("Size of: ", stringify!(_GTuples))
+        concat!(
+            "Size of: ",
+            stringify!(_GTuples)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTuples>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GTuples))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTuples)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).len) as usize - ptr as usize },
@@ -17635,12 +18910,18 @@ fn bindgen_test_layout__GThread() {
     assert_eq!(
         ::std::mem::size_of::<_GThread>(),
         24usize,
-        concat!("Size of: ", stringify!(_GThread))
+        concat!(
+            "Size of: ",
+            stringify!(_GThread)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GThread>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GThread))
+        concat!(
+            "Alignment of ",
+            stringify!(_GThread)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).func) as usize - ptr as usize },
@@ -17740,12 +19021,18 @@ fn bindgen_test_layout__GThreadFunctions() {
     assert_eq!(
         ::std::mem::size_of::<_GThreadFunctions>(),
         168usize,
-        concat!("Size of: ", stringify!(_GThreadFunctions))
+        concat!(
+            "Size of: ",
+            stringify!(_GThreadFunctions)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GThreadFunctions>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GThreadFunctions))
+        concat!(
+            "Alignment of ",
+            stringify!(_GThreadFunctions)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).mutex_new) as usize - ptr as usize },
@@ -18022,12 +19309,18 @@ fn bindgen_test_layout_pthread_mutexattr_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_mutexattr_t>(),
         4usize,
-        concat!("Size of: ", stringify!(pthread_mutexattr_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_mutexattr_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_mutexattr_t>(),
         4usize,
-        concat!("Alignment of ", stringify!(pthread_mutexattr_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_mutexattr_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__attr) as usize - ptr as usize },
@@ -18052,12 +19345,18 @@ fn bindgen_test_layout_pthread_condattr_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_condattr_t>(),
         4usize,
-        concat!("Size of: ", stringify!(pthread_condattr_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_condattr_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_condattr_t>(),
         4usize,
-        concat!("Alignment of ", stringify!(pthread_condattr_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_condattr_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__attr) as usize - ptr as usize },
@@ -18083,12 +19382,18 @@ fn bindgen_test_layout_pthread_barrierattr_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_barrierattr_t>(),
         4usize,
-        concat!("Size of: ", stringify!(pthread_barrierattr_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_barrierattr_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_barrierattr_t>(),
         4usize,
-        concat!("Alignment of ", stringify!(pthread_barrierattr_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_barrierattr_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__attr) as usize - ptr as usize },
@@ -18113,12 +19418,18 @@ fn bindgen_test_layout_pthread_rwlockattr_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_rwlockattr_t>(),
         8usize,
-        concat!("Size of: ", stringify!(pthread_rwlockattr_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_rwlockattr_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_rwlockattr_t>(),
         4usize,
-        concat!("Alignment of ", stringify!(pthread_rwlockattr_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_rwlockattr_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__attr) as usize - ptr as usize },
@@ -18151,12 +19462,18 @@ fn bindgen_test_layout_pthread_mutex_t__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<pthread_mutex_t__bindgen_ty_1>(),
         40usize,
-        concat!("Size of: ", stringify!(pthread_mutex_t__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_mutex_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_mutex_t__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_mutex_t__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_mutex_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__i) as usize - ptr as usize },
@@ -18191,7 +19508,10 @@ fn bindgen_test_layout_pthread_mutex_t__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for pthread_mutex_t__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_mutex_t__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "pthread_mutex_t__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -18201,12 +19521,18 @@ fn bindgen_test_layout_pthread_mutex_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_mutex_t>(),
         40usize,
-        concat!("Size of: ", stringify!(pthread_mutex_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_mutex_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_mutex_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_mutex_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_mutex_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__u) as usize - ptr as usize },
@@ -18221,7 +19547,11 @@ fn bindgen_test_layout_pthread_mutex_t() {
 }
 impl ::std::fmt::Debug for pthread_mutex_t {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_mutex_t {{ __u: {:?} }}", self.__u)
+        write!(
+            f,
+            "pthread_mutex_t {{ __u: {:?} }}",
+            self.__u
+        )
     }
 }
 #[repr(C)]
@@ -18244,12 +19574,18 @@ fn bindgen_test_layout_pthread_cond_t__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<pthread_cond_t__bindgen_ty_1>(),
         48usize,
-        concat!("Size of: ", stringify!(pthread_cond_t__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_cond_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_cond_t__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_cond_t__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_cond_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__i) as usize - ptr as usize },
@@ -18284,7 +19620,10 @@ fn bindgen_test_layout_pthread_cond_t__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for pthread_cond_t__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_cond_t__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "pthread_cond_t__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -18294,12 +19633,18 @@ fn bindgen_test_layout_pthread_cond_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_cond_t>(),
         48usize,
-        concat!("Size of: ", stringify!(pthread_cond_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_cond_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_cond_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_cond_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_cond_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__u) as usize - ptr as usize },
@@ -18314,7 +19659,11 @@ fn bindgen_test_layout_pthread_cond_t() {
 }
 impl ::std::fmt::Debug for pthread_cond_t {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_cond_t {{ __u: {:?} }}", self.__u)
+        write!(
+            f,
+            "pthread_cond_t {{ __u: {:?} }}",
+            self.__u
+        )
     }
 }
 #[repr(C)]
@@ -18337,12 +19686,18 @@ fn bindgen_test_layout_pthread_rwlock_t__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<pthread_rwlock_t__bindgen_ty_1>(),
         56usize,
-        concat!("Size of: ", stringify!(pthread_rwlock_t__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_rwlock_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_rwlock_t__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_rwlock_t__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_rwlock_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__i) as usize - ptr as usize },
@@ -18377,7 +19732,10 @@ fn bindgen_test_layout_pthread_rwlock_t__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for pthread_rwlock_t__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_rwlock_t__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "pthread_rwlock_t__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -18387,12 +19745,18 @@ fn bindgen_test_layout_pthread_rwlock_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_rwlock_t>(),
         56usize,
-        concat!("Size of: ", stringify!(pthread_rwlock_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_rwlock_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_rwlock_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_rwlock_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_rwlock_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__u) as usize - ptr as usize },
@@ -18407,7 +19771,11 @@ fn bindgen_test_layout_pthread_rwlock_t() {
 }
 impl ::std::fmt::Debug for pthread_rwlock_t {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_rwlock_t {{ __u: {:?} }}", self.__u)
+        write!(
+            f,
+            "pthread_rwlock_t {{ __u: {:?} }}",
+            self.__u
+        )
     }
 }
 #[repr(C)]
@@ -18430,12 +19798,18 @@ fn bindgen_test_layout_pthread_barrier_t__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<pthread_barrier_t__bindgen_ty_1>(),
         32usize,
-        concat!("Size of: ", stringify!(pthread_barrier_t__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_barrier_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_barrier_t__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_barrier_t__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_barrier_t__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__i) as usize - ptr as usize },
@@ -18470,7 +19844,10 @@ fn bindgen_test_layout_pthread_barrier_t__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for pthread_barrier_t__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_barrier_t__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "pthread_barrier_t__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -18480,12 +19857,18 @@ fn bindgen_test_layout_pthread_barrier_t() {
     assert_eq!(
         ::std::mem::size_of::<pthread_barrier_t>(),
         32usize,
-        concat!("Size of: ", stringify!(pthread_barrier_t))
+        concat!(
+            "Size of: ",
+            stringify!(pthread_barrier_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<pthread_barrier_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(pthread_barrier_t))
+        concat!(
+            "Alignment of ",
+            stringify!(pthread_barrier_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__u) as usize - ptr as usize },
@@ -18500,7 +19883,11 @@ fn bindgen_test_layout_pthread_barrier_t() {
 }
 impl ::std::fmt::Debug for pthread_barrier_t {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "pthread_barrier_t {{ __u: {:?} }}", self.__u)
+        write!(
+            f,
+            "pthread_barrier_t {{ __u: {:?} }}",
+            self.__u
+        )
     }
 }
 pub type u_int8_t = ::std::os::raw::c_uchar;
@@ -18529,12 +19916,18 @@ fn bindgen_test_layout_timeval() {
     assert_eq!(
         ::std::mem::size_of::<timeval>(),
         16usize,
-        concat!("Size of: ", stringify!(timeval))
+        concat!(
+            "Size of: ",
+            stringify!(timeval)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<timeval>(),
         8usize,
-        concat!("Alignment of ", stringify!(timeval))
+        concat!(
+            "Alignment of ",
+            stringify!(timeval)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).tv_sec) as usize - ptr as usize },
@@ -18570,12 +19963,18 @@ fn bindgen_test_layout_fd_set() {
     assert_eq!(
         ::std::mem::size_of::<fd_set>(),
         128usize,
-        concat!("Size of: ", stringify!(fd_set))
+        concat!(
+            "Size of: ",
+            stringify!(fd_set)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<fd_set>(),
         8usize,
-        concat!("Alignment of ", stringify!(fd_set))
+        concat!(
+            "Alignment of ",
+            stringify!(fd_set)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).fds_bits) as usize - ptr as usize },
@@ -18629,12 +20028,18 @@ fn bindgen_test_layout_sched_param__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<sched_param__bindgen_ty_1>(),
         16usize,
-        concat!("Size of: ", stringify!(sched_param__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(sched_param__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sched_param__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(sched_param__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(sched_param__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__reserved1) as usize - ptr as usize },
@@ -18664,12 +20069,18 @@ fn bindgen_test_layout_sched_param() {
     assert_eq!(
         ::std::mem::size_of::<sched_param>(),
         48usize,
-        concat!("Size of: ", stringify!(sched_param))
+        concat!(
+            "Size of: ",
+            stringify!(sched_param)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<sched_param>(),
         8usize,
-        concat!("Alignment of ", stringify!(sched_param))
+        concat!(
+            "Alignment of ",
+            stringify!(sched_param)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).sched_priority) as usize - ptr as usize },
@@ -19231,12 +20642,18 @@ fn bindgen_test_layout___ptcb() {
     assert_eq!(
         ::std::mem::size_of::<__ptcb>(),
         24usize,
-        concat!("Size of: ", stringify!(__ptcb))
+        concat!(
+            "Size of: ",
+            stringify!(__ptcb)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<__ptcb>(),
         8usize,
-        concat!("Alignment of ", stringify!(__ptcb))
+        concat!(
+            "Alignment of ",
+            stringify!(__ptcb)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__f) as usize - ptr as usize },
@@ -19292,12 +20709,18 @@ fn bindgen_test_layout_GStaticMutex() {
     assert_eq!(
         ::std::mem::size_of::<GStaticMutex>(),
         48usize,
-        concat!("Size of: ", stringify!(GStaticMutex))
+        concat!(
+            "Size of: ",
+            stringify!(GStaticMutex)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GStaticMutex>(),
         8usize,
-        concat!("Alignment of ", stringify!(GStaticMutex))
+        concat!(
+            "Alignment of ",
+            stringify!(GStaticMutex)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).mutex) as usize - ptr as usize },
@@ -19360,12 +20783,18 @@ fn bindgen_test_layout__GStaticRecMutex__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_GStaticRecMutex__bindgen_ty_1>(),
         8usize,
-        concat!("Size of: ", stringify!(_GStaticRecMutex__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_GStaticRecMutex__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GStaticRecMutex__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GStaticRecMutex__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_GStaticRecMutex__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).owner) as usize - ptr as usize },
@@ -19390,7 +20819,10 @@ fn bindgen_test_layout__GStaticRecMutex__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for _GStaticRecMutex__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GStaticRecMutex__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "_GStaticRecMutex__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -19400,12 +20832,18 @@ fn bindgen_test_layout__GStaticRecMutex() {
     assert_eq!(
         ::std::mem::size_of::<_GStaticRecMutex>(),
         64usize,
-        concat!("Size of: ", stringify!(_GStaticRecMutex))
+        concat!(
+            "Size of: ",
+            stringify!(_GStaticRecMutex)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GStaticRecMutex>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GStaticRecMutex))
+        concat!(
+            "Alignment of ",
+            stringify!(_GStaticRecMutex)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).mutex) as usize - ptr as usize },
@@ -19487,12 +20925,18 @@ fn bindgen_test_layout__GStaticRWLock() {
     assert_eq!(
         ::std::mem::size_of::<_GStaticRWLock>(),
         80usize,
-        concat!("Size of: ", stringify!(_GStaticRWLock))
+        concat!(
+            "Size of: ",
+            stringify!(_GStaticRWLock)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GStaticRWLock>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GStaticRWLock))
+        concat!(
+            "Alignment of ",
+            stringify!(_GStaticRWLock)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).mutex) as usize - ptr as usize },
@@ -19610,12 +21054,18 @@ fn bindgen_test_layout__GStaticPrivate() {
     assert_eq!(
         ::std::mem::size_of::<_GStaticPrivate>(),
         4usize,
-        concat!("Size of: ", stringify!(_GStaticPrivate))
+        concat!(
+            "Size of: ",
+            stringify!(_GStaticPrivate)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GStaticPrivate>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GStaticPrivate))
+        concat!(
+            "Alignment of ",
+            stringify!(_GStaticPrivate)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).index) as usize - ptr as usize },
@@ -19907,12 +21357,18 @@ fn bindgen_test_layout__G_fpos64_t() {
     assert_eq!(
         ::std::mem::size_of::<_G_fpos64_t>(),
         16usize,
-        concat!("Size of: ", stringify!(_G_fpos64_t))
+        concat!(
+            "Size of: ",
+            stringify!(_G_fpos64_t)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_G_fpos64_t>(),
         8usize,
-        concat!("Alignment of ", stringify!(_G_fpos64_t))
+        concat!(
+            "Alignment of ",
+            stringify!(_G_fpos64_t)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).__opaque) as usize - ptr as usize },
@@ -19947,7 +21403,10 @@ fn bindgen_test_layout__G_fpos64_t() {
 }
 impl ::std::fmt::Debug for _G_fpos64_t {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_G_fpos64_t {{ union }}")
+        write!(
+            f,
+            "_G_fpos64_t {{ union }}"
+        )
     }
 }
 pub type fpos_t = _G_fpos64_t;
@@ -20398,12 +21857,18 @@ fn bindgen_test_layout_stat() {
     assert_eq!(
         ::std::mem::size_of::<stat>(),
         144usize,
-        concat!("Size of: ", stringify!(stat))
+        concat!(
+            "Size of: ",
+            stringify!(stat)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<stat>(),
         8usize,
-        concat!("Alignment of ", stringify!(stat))
+        concat!(
+            "Alignment of ",
+            stringify!(stat)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).st_dev) as usize - ptr as usize },
@@ -20718,7 +22183,10 @@ pub struct _GTypeCValue {
 }
 impl ::std::fmt::Debug for _GTypeCValue {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GTypeCValue {{ union }}")
+        write!(
+            f,
+            "_GTypeCValue {{ union }}"
+        )
     }
 }
 pub type GTypeCValue = _GTypeCValue;
@@ -20748,12 +22216,18 @@ fn bindgen_test_layout__GTypeClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeClass>(),
         8usize,
-        concat!("Size of: ", stringify!(_GTypeClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type) as usize - ptr as usize },
@@ -20778,12 +22252,18 @@ fn bindgen_test_layout__GTypeInstance() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeInstance>(),
         8usize,
-        concat!("Size of: ", stringify!(_GTypeInstance))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeInstance)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeInstance>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeInstance))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeInstance)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_class) as usize - ptr as usize },
@@ -20809,12 +22289,18 @@ fn bindgen_test_layout__GTypeInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeInterface>(),
         16usize,
-        concat!("Size of: ", stringify!(_GTypeInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type) as usize - ptr as usize },
@@ -20852,12 +22338,18 @@ fn bindgen_test_layout__GTypeQuery() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeQuery>(),
         24usize,
-        concat!("Size of: ", stringify!(_GTypeQuery))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeQuery)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeQuery>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeQuery))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeQuery)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).type_) as usize - ptr as usize },
@@ -21030,12 +22522,18 @@ fn bindgen_test_layout__GTypeInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeInfo>(),
         72usize,
-        concat!("Size of: ", stringify!(_GTypeInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).class_size) as usize - ptr as usize },
@@ -21151,12 +22649,18 @@ fn bindgen_test_layout__GTypeFundamentalInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeFundamentalInfo>(),
         4usize,
-        concat!("Size of: ", stringify!(_GTypeFundamentalInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeFundamentalInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeFundamentalInfo>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GTypeFundamentalInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeFundamentalInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).type_flags) as usize - ptr as usize },
@@ -21183,12 +22687,18 @@ fn bindgen_test_layout__GInterfaceInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GInterfaceInfo>(),
         24usize,
-        concat!("Size of: ", stringify!(_GInterfaceInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GInterfaceInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInterfaceInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInterfaceInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInterfaceInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).interface_init) as usize - ptr as usize },
@@ -21257,12 +22767,18 @@ fn bindgen_test_layout__GTypeValueTable() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeValueTable>(),
         64usize,
-        concat!("Size of: ", stringify!(_GTypeValueTable))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeValueTable)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeValueTable>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeValueTable))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeValueTable)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).value_init) as usize - ptr as usize },
@@ -21547,12 +23063,18 @@ fn bindgen_test_layout__GValue__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<_GValue__bindgen_ty_1>(),
         8usize,
-        concat!("Size of: ", stringify!(_GValue__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(_GValue__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GValue__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GValue__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(_GValue__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).v_int) as usize - ptr as usize },
@@ -21647,7 +23169,10 @@ fn bindgen_test_layout__GValue__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for _GValue__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "_GValue__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "_GValue__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -21657,12 +23182,18 @@ fn bindgen_test_layout__GValue() {
     assert_eq!(
         ::std::mem::size_of::<_GValue>(),
         24usize,
-        concat!("Size of: ", stringify!(_GValue))
+        concat!(
+            "Size of: ",
+            stringify!(_GValue)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GValue>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GValue))
+        concat!(
+            "Alignment of ",
+            stringify!(_GValue)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type) as usize - ptr as usize },
@@ -21777,12 +23308,18 @@ fn bindgen_test_layout__GParamSpec() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpec>(),
         72usize,
-        concat!("Size of: ", stringify!(_GParamSpec))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpec)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpec>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpec))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpec)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type_instance) as usize - ptr as usize },
@@ -21915,12 +23452,18 @@ fn bindgen_test_layout__GParamSpecClass() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecClass>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type_class) as usize - ptr as usize },
@@ -22016,12 +23559,18 @@ fn bindgen_test_layout__GParameter() {
     assert_eq!(
         ::std::mem::size_of::<_GParameter>(),
         32usize,
-        concat!("Size of: ", stringify!(_GParameter))
+        concat!(
+            "Size of: ",
+            stringify!(_GParameter)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParameter>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParameter))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParameter)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).name) as usize - ptr as usize },
@@ -22171,12 +23720,18 @@ fn bindgen_test_layout__GParamSpecTypeInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecTypeInfo>(),
         56usize,
-        concat!("Size of: ", stringify!(_GParamSpecTypeInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecTypeInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecTypeInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecTypeInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecTypeInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).instance_size) as usize - ptr as usize },
@@ -22356,12 +23911,18 @@ fn bindgen_test_layout__GClosureNotifyData() {
     assert_eq!(
         ::std::mem::size_of::<_GClosureNotifyData>(),
         16usize,
-        concat!("Size of: ", stringify!(_GClosureNotifyData))
+        concat!(
+            "Size of: ",
+            stringify!(_GClosureNotifyData)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GClosureNotifyData>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GClosureNotifyData))
+        concat!(
+            "Alignment of ",
+            stringify!(_GClosureNotifyData)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -22409,12 +23970,18 @@ fn bindgen_test_layout__GClosure() {
     assert_eq!(
         ::std::mem::size_of::<_GClosure>(),
         32usize,
-        concat!("Size of: ", stringify!(_GClosure))
+        concat!(
+            "Size of: ",
+            stringify!(_GClosure)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GClosure>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GClosure))
+        concat!(
+            "Alignment of ",
+            stringify!(_GClosure)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).marshal) as usize - ptr as usize },
@@ -22450,112 +24017,242 @@ fn bindgen_test_layout__GClosure() {
 impl _GClosure {
     #[inline]
     pub fn ref_count(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 15u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        15u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_ref_count(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 15u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    15u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn meta_marshal_nouse(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(15usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        15usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_meta_marshal_nouse(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(15usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    15usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn n_guards(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        16usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_n_guards(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(16usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    16usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn n_fnotifiers(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(17usize, 2u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        17usize,
+                        2u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_n_fnotifiers(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(17usize, 2u8, val as u64)
+            self._bitfield_1
+                .set(
+                    17usize,
+                    2u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn n_inotifiers(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(19usize, 8u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        19usize,
+                        8u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_n_inotifiers(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(19usize, 8u8, val as u64)
+            self._bitfield_1
+                .set(
+                    19usize,
+                    8u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn in_inotify(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(27usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        27usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_in_inotify(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(27usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    27usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn floating(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(28usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        28usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_floating(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(28usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    28usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn derivative_flag(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(29usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        29usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_derivative_flag(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(29usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    29usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn in_marshal(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(30usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        30usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_in_marshal(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(30usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    30usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn is_invalid(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        31usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_is_invalid(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(31usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    31usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -22572,46 +24269,86 @@ impl _GClosure {
         is_invalid: guint,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 15u8, {
-            let ref_count: u32 = unsafe { ::std::mem::transmute(ref_count) };
-            ref_count as u64
-        });
-        __bindgen_bitfield_unit.set(15usize, 1u8, {
-            let meta_marshal_nouse: u32 = unsafe { ::std::mem::transmute(meta_marshal_nouse) };
-            meta_marshal_nouse as u64
-        });
-        __bindgen_bitfield_unit.set(16usize, 1u8, {
-            let n_guards: u32 = unsafe { ::std::mem::transmute(n_guards) };
-            n_guards as u64
-        });
-        __bindgen_bitfield_unit.set(17usize, 2u8, {
-            let n_fnotifiers: u32 = unsafe { ::std::mem::transmute(n_fnotifiers) };
-            n_fnotifiers as u64
-        });
-        __bindgen_bitfield_unit.set(19usize, 8u8, {
-            let n_inotifiers: u32 = unsafe { ::std::mem::transmute(n_inotifiers) };
-            n_inotifiers as u64
-        });
-        __bindgen_bitfield_unit.set(27usize, 1u8, {
-            let in_inotify: u32 = unsafe { ::std::mem::transmute(in_inotify) };
-            in_inotify as u64
-        });
-        __bindgen_bitfield_unit.set(28usize, 1u8, {
-            let floating: u32 = unsafe { ::std::mem::transmute(floating) };
-            floating as u64
-        });
-        __bindgen_bitfield_unit.set(29usize, 1u8, {
-            let derivative_flag: u32 = unsafe { ::std::mem::transmute(derivative_flag) };
-            derivative_flag as u64
-        });
-        __bindgen_bitfield_unit.set(30usize, 1u8, {
-            let in_marshal: u32 = unsafe { ::std::mem::transmute(in_marshal) };
-            in_marshal as u64
-        });
-        __bindgen_bitfield_unit.set(31usize, 1u8, {
-            let is_invalid: u32 = unsafe { ::std::mem::transmute(is_invalid) };
-            is_invalid as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            15u8,
+            {
+                let ref_count: u32 = unsafe { ::std::mem::transmute(ref_count) };
+                ref_count as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            15usize,
+            1u8,
+            {
+                let meta_marshal_nouse: u32 = unsafe { ::std::mem::transmute(meta_marshal_nouse) };
+                meta_marshal_nouse as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            16usize,
+            1u8,
+            {
+                let n_guards: u32 = unsafe { ::std::mem::transmute(n_guards) };
+                n_guards as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            17usize,
+            2u8,
+            {
+                let n_fnotifiers: u32 = unsafe { ::std::mem::transmute(n_fnotifiers) };
+                n_fnotifiers as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            19usize,
+            8u8,
+            {
+                let n_inotifiers: u32 = unsafe { ::std::mem::transmute(n_inotifiers) };
+                n_inotifiers as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            27usize,
+            1u8,
+            {
+                let in_inotify: u32 = unsafe { ::std::mem::transmute(in_inotify) };
+                in_inotify as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            28usize,
+            1u8,
+            {
+                let floating: u32 = unsafe { ::std::mem::transmute(floating) };
+                floating as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            29usize,
+            1u8,
+            {
+                let derivative_flag: u32 = unsafe { ::std::mem::transmute(derivative_flag) };
+                derivative_flag as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            30usize,
+            1u8,
+            {
+                let in_marshal: u32 = unsafe { ::std::mem::transmute(in_marshal) };
+                in_marshal as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            31usize,
+            1u8,
+            {
+                let is_invalid: u32 = unsafe { ::std::mem::transmute(is_invalid) };
+                is_invalid as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -22628,12 +24365,18 @@ fn bindgen_test_layout__GCClosure() {
     assert_eq!(
         ::std::mem::size_of::<_GCClosure>(),
         40usize,
-        concat!("Size of: ", stringify!(_GCClosure))
+        concat!(
+            "Size of: ",
+            stringify!(_GCClosure)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GCClosure>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GCClosure))
+        concat!(
+            "Alignment of ",
+            stringify!(_GCClosure)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).closure) as usize - ptr as usize },
@@ -23284,12 +25027,18 @@ fn bindgen_test_layout__GSignalInvocationHint() {
     assert_eq!(
         ::std::mem::size_of::<_GSignalInvocationHint>(),
         12usize,
-        concat!("Size of: ", stringify!(_GSignalInvocationHint))
+        concat!(
+            "Size of: ",
+            stringify!(_GSignalInvocationHint)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSignalInvocationHint>(),
         4usize,
-        concat!("Alignment of ", stringify!(_GSignalInvocationHint))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSignalInvocationHint)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).signal_id) as usize - ptr as usize },
@@ -23340,12 +25089,18 @@ fn bindgen_test_layout__GSignalQuery() {
     assert_eq!(
         ::std::mem::size_of::<_GSignalQuery>(),
         56usize,
-        concat!("Size of: ", stringify!(_GSignalQuery))
+        concat!(
+            "Size of: ",
+            stringify!(_GSignalQuery)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSignalQuery>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSignalQuery))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSignalQuery)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).signal_id) as usize - ptr as usize },
@@ -23863,12 +25618,18 @@ fn bindgen_test_layout__GObject() {
     assert_eq!(
         ::std::mem::size_of::<_GObject>(),
         24usize,
-        concat!("Size of: ", stringify!(_GObject))
+        concat!(
+            "Size of: ",
+            stringify!(_GObject)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GObject>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GObject))
+        concat!(
+            "Alignment of ",
+            stringify!(_GObject)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type_instance) as usize - ptr as usize },
@@ -23950,12 +25711,18 @@ fn bindgen_test_layout__GObjectClass() {
     assert_eq!(
         ::std::mem::size_of::<_GObjectClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GObjectClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GObjectClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GObjectClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GObjectClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GObjectClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type_class) as usize - ptr as usize },
@@ -24122,12 +25889,18 @@ fn bindgen_test_layout__GObjectConstructParam() {
     assert_eq!(
         ::std::mem::size_of::<_GObjectConstructParam>(),
         16usize,
-        concat!("Size of: ", stringify!(_GObjectConstructParam))
+        concat!(
+            "Size of: ",
+            stringify!(_GObjectConstructParam)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GObjectConstructParam>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GObjectConstructParam))
+        concat!(
+            "Alignment of ",
+            stringify!(_GObjectConstructParam)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).pspec) as usize - ptr as usize },
@@ -24472,12 +26245,18 @@ fn bindgen_test_layout_GWeakRef__bindgen_ty_1() {
     assert_eq!(
         ::std::mem::size_of::<GWeakRef__bindgen_ty_1>(),
         8usize,
-        concat!("Size of: ", stringify!(GWeakRef__bindgen_ty_1))
+        concat!(
+            "Size of: ",
+            stringify!(GWeakRef__bindgen_ty_1)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GWeakRef__bindgen_ty_1>(),
         8usize,
-        concat!("Alignment of ", stringify!(GWeakRef__bindgen_ty_1))
+        concat!(
+            "Alignment of ",
+            stringify!(GWeakRef__bindgen_ty_1)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).p) as usize - ptr as usize },
@@ -24492,7 +26271,10 @@ fn bindgen_test_layout_GWeakRef__bindgen_ty_1() {
 }
 impl ::std::fmt::Debug for GWeakRef__bindgen_ty_1 {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "GWeakRef__bindgen_ty_1 {{ union }}")
+        write!(
+            f,
+            "GWeakRef__bindgen_ty_1 {{ union }}"
+        )
     }
 }
 #[test]
@@ -24502,12 +26284,18 @@ fn bindgen_test_layout_GWeakRef() {
     assert_eq!(
         ::std::mem::size_of::<GWeakRef>(),
         8usize,
-        concat!("Size of: ", stringify!(GWeakRef))
+        concat!(
+            "Size of: ",
+            stringify!(GWeakRef)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GWeakRef>(),
         8usize,
-        concat!("Alignment of ", stringify!(GWeakRef))
+        concat!(
+            "Alignment of ",
+            stringify!(GWeakRef)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).priv_) as usize - ptr as usize },
@@ -24522,7 +26310,11 @@ fn bindgen_test_layout_GWeakRef() {
 }
 impl ::std::fmt::Debug for GWeakRef {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write!(f, "GWeakRef {{ priv: {:?} }}", self.priv_)
+        write!(
+            f,
+            "GWeakRef {{ priv: {:?} }}",
+            self.priv_
+        )
     }
 }
 extern "C" {
@@ -24690,12 +26482,18 @@ fn bindgen_test_layout__GEnumClass() {
     assert_eq!(
         ::std::mem::size_of::<_GEnumClass>(),
         32usize,
-        concat!("Size of: ", stringify!(_GEnumClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GEnumClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GEnumClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GEnumClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GEnumClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type_class) as usize - ptr as usize },
@@ -24763,12 +26561,18 @@ fn bindgen_test_layout__GFlagsClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFlagsClass>(),
         24usize,
-        concat!("Size of: ", stringify!(_GFlagsClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFlagsClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFlagsClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFlagsClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFlagsClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_type_class) as usize - ptr as usize },
@@ -24825,12 +26629,18 @@ fn bindgen_test_layout__GEnumValue() {
     assert_eq!(
         ::std::mem::size_of::<_GEnumValue>(),
         24usize,
-        concat!("Size of: ", stringify!(_GEnumValue))
+        concat!(
+            "Size of: ",
+            stringify!(_GEnumValue)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GEnumValue>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GEnumValue))
+        concat!(
+            "Alignment of ",
+            stringify!(_GEnumValue)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).value) as usize - ptr as usize },
@@ -24877,12 +26687,18 @@ fn bindgen_test_layout__GFlagsValue() {
     assert_eq!(
         ::std::mem::size_of::<_GFlagsValue>(),
         24usize,
-        concat!("Size of: ", stringify!(_GFlagsValue))
+        concat!(
+            "Size of: ",
+            stringify!(_GFlagsValue)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFlagsValue>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFlagsValue))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFlagsValue)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).value) as usize - ptr as usize },
@@ -25040,12 +26856,18 @@ fn bindgen_test_layout__GParamSpecChar() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecChar>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecChar))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecChar)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecChar>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecChar))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecChar)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25103,12 +26925,18 @@ fn bindgen_test_layout__GParamSpecUChar() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecUChar>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecUChar))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecUChar)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecUChar>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecUChar))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecUChar)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25164,12 +26992,18 @@ fn bindgen_test_layout__GParamSpecBoolean() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecBoolean>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecBoolean))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecBoolean)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecBoolean>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecBoolean))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecBoolean)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25207,12 +27041,18 @@ fn bindgen_test_layout__GParamSpecInt() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecInt>(),
         88usize,
-        concat!("Size of: ", stringify!(_GParamSpecInt))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecInt)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecInt>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecInt))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecInt)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25270,12 +27110,18 @@ fn bindgen_test_layout__GParamSpecUInt() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecUInt>(),
         88usize,
-        concat!("Size of: ", stringify!(_GParamSpecUInt))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecUInt)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecUInt>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecUInt))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecUInt)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25333,12 +27179,18 @@ fn bindgen_test_layout__GParamSpecLong() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecLong>(),
         96usize,
-        concat!("Size of: ", stringify!(_GParamSpecLong))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecLong)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecLong>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecLong))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecLong)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25396,12 +27248,18 @@ fn bindgen_test_layout__GParamSpecULong() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecULong>(),
         96usize,
-        concat!("Size of: ", stringify!(_GParamSpecULong))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecULong)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecULong>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecULong))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecULong)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25459,12 +27317,18 @@ fn bindgen_test_layout__GParamSpecInt64() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecInt64>(),
         96usize,
-        concat!("Size of: ", stringify!(_GParamSpecInt64))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecInt64)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecInt64>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecInt64))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecInt64)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25522,12 +27386,18 @@ fn bindgen_test_layout__GParamSpecUInt64() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecUInt64>(),
         96usize,
-        concat!("Size of: ", stringify!(_GParamSpecUInt64))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecUInt64)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecUInt64>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecUInt64))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecUInt64)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25583,12 +27453,18 @@ fn bindgen_test_layout__GParamSpecUnichar() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecUnichar>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecUnichar))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecUnichar)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecUnichar>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecUnichar))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecUnichar)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25625,12 +27501,18 @@ fn bindgen_test_layout__GParamSpecEnum() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecEnum>(),
         88usize,
-        concat!("Size of: ", stringify!(_GParamSpecEnum))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecEnum)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecEnum>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecEnum))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecEnum)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25677,12 +27559,18 @@ fn bindgen_test_layout__GParamSpecFlags() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecFlags>(),
         88usize,
-        concat!("Size of: ", stringify!(_GParamSpecFlags))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecFlags)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecFlags>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecFlags))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecFlags)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25731,12 +27619,18 @@ fn bindgen_test_layout__GParamSpecFloat() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecFloat>(),
         88usize,
-        concat!("Size of: ", stringify!(_GParamSpecFloat))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecFloat)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecFloat>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecFloat))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecFloat)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25805,12 +27699,18 @@ fn bindgen_test_layout__GParamSpecDouble() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecDouble>(),
         104usize,
-        concat!("Size of: ", stringify!(_GParamSpecDouble))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecDouble)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecDouble>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecDouble))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecDouble)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25882,12 +27782,18 @@ fn bindgen_test_layout__GParamSpecString() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecString>(),
         104usize,
-        concat!("Size of: ", stringify!(_GParamSpecString))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecString)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecString>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecString))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecString)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -25943,24 +27849,50 @@ fn bindgen_test_layout__GParamSpecString() {
 impl _GParamSpecString {
     #[inline]
     pub fn null_fold_if_empty(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        0usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_null_fold_if_empty(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    0usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
     pub fn ensure_non_null(&self) -> guint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+        unsafe {
+            ::std::mem::transmute(
+                self._bitfield_1
+                    .get(
+                        1usize,
+                        1u8,
+                    ) as u32,
+            )
+        }
     }
     #[inline]
     pub fn set_ensure_non_null(&mut self, val: guint) {
         unsafe {
             let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
+            self._bitfield_1
+                .set(
+                    1usize,
+                    1u8,
+                    val as u64,
+                )
         }
     }
     #[inline]
@@ -25969,14 +27901,22 @@ impl _GParamSpecString {
         ensure_non_null: guint,
     ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let null_fold_if_empty: u32 = unsafe { ::std::mem::transmute(null_fold_if_empty) };
-            null_fold_if_empty as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let ensure_non_null: u32 = unsafe { ::std::mem::transmute(ensure_non_null) };
-            ensure_non_null as u64
-        });
+        __bindgen_bitfield_unit.set(
+            0usize,
+            1u8,
+            {
+                let null_fold_if_empty: u32 = unsafe { ::std::mem::transmute(null_fold_if_empty) };
+                null_fold_if_empty as u64
+            },
+        );
+        __bindgen_bitfield_unit.set(
+            1usize,
+            1u8,
+            {
+                let ensure_non_null: u32 = unsafe { ::std::mem::transmute(ensure_non_null) };
+                ensure_non_null as u64
+            },
+        );
         __bindgen_bitfield_unit
     }
 }
@@ -25992,12 +27932,18 @@ fn bindgen_test_layout__GParamSpecParam() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecParam>(),
         72usize,
-        concat!("Size of: ", stringify!(_GParamSpecParam))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecParam)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecParam>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecParam))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecParam)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26022,12 +27968,18 @@ fn bindgen_test_layout__GParamSpecBoxed() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecBoxed>(),
         72usize,
-        concat!("Size of: ", stringify!(_GParamSpecBoxed))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecBoxed)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecBoxed>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecBoxed))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecBoxed)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26052,12 +28004,18 @@ fn bindgen_test_layout__GParamSpecPointer() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecPointer>(),
         72usize,
-        concat!("Size of: ", stringify!(_GParamSpecPointer))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecPointer)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecPointer>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecPointer))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecPointer)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26085,12 +28043,18 @@ fn bindgen_test_layout__GParamSpecValueArray() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecValueArray>(),
         88usize,
-        concat!("Size of: ", stringify!(_GParamSpecValueArray))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecValueArray)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecValueArray>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecValueArray))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecValueArray)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26135,12 +28099,18 @@ fn bindgen_test_layout__GParamSpecObject() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecObject>(),
         72usize,
-        concat!("Size of: ", stringify!(_GParamSpecObject))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecObject)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecObject>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecObject))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecObject)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26166,12 +28136,18 @@ fn bindgen_test_layout__GParamSpecOverride() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecOverride>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecOverride))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecOverride)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecOverride>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecOverride))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecOverride)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26207,12 +28183,18 @@ fn bindgen_test_layout__GParamSpecGType() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecGType>(),
         80usize,
-        concat!("Size of: ", stringify!(_GParamSpecGType))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecGType)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecGType>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecGType))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecGType)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26250,12 +28232,18 @@ fn bindgen_test_layout__GParamSpecVariant() {
     assert_eq!(
         ::std::mem::size_of::<_GParamSpecVariant>(),
         120usize,
-        concat!("Size of: ", stringify!(_GParamSpecVariant))
+        concat!(
+            "Size of: ",
+            stringify!(_GParamSpecVariant)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GParamSpecVariant>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GParamSpecVariant))
+        concat!(
+            "Alignment of ",
+            stringify!(_GParamSpecVariant)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26630,12 +28618,18 @@ fn bindgen_test_layout__GTypeModule() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeModule>(),
         56usize,
-        concat!("Size of: ", stringify!(_GTypeModule))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeModule)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeModule>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeModule))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeModule)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -26706,12 +28700,18 @@ fn bindgen_test_layout__GTypeModuleClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTypeModuleClass>(),
         184usize,
-        concat!("Size of: ", stringify!(_GTypeModuleClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypeModuleClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypeModuleClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypeModuleClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypeModuleClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -26862,12 +28862,18 @@ fn bindgen_test_layout__GTypePluginClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTypePluginClass>(),
         48usize,
-        concat!("Size of: ", stringify!(_GTypePluginClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTypePluginClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTypePluginClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTypePluginClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTypePluginClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).base_iface) as usize - ptr as usize },
@@ -26960,12 +28966,18 @@ fn bindgen_test_layout__GValueArray() {
     assert_eq!(
         ::std::mem::size_of::<_GValueArray>(),
         24usize,
-        concat!("Size of: ", stringify!(_GValueArray))
+        concat!(
+            "Size of: ",
+            stringify!(_GValueArray)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GValueArray>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GValueArray))
+        concat!(
+            "Alignment of ",
+            stringify!(_GValueArray)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).n_values) as usize - ptr as usize },
@@ -28187,12 +30199,18 @@ fn bindgen_test_layout__GInputVector() {
     assert_eq!(
         ::std::mem::size_of::<_GInputVector>(),
         16usize,
-        concat!("Size of: ", stringify!(_GInputVector))
+        concat!(
+            "Size of: ",
+            stringify!(_GInputVector)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInputVector>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInputVector))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInputVector)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).buffer) as usize - ptr as usize },
@@ -28234,12 +30252,18 @@ fn bindgen_test_layout__GInputMessage() {
     assert_eq!(
         ::std::mem::size_of::<_GInputMessage>(),
         56usize,
-        concat!("Size of: ", stringify!(_GInputMessage))
+        concat!(
+            "Size of: ",
+            stringify!(_GInputMessage)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInputMessage>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInputMessage))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInputMessage)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).address) as usize - ptr as usize },
@@ -28326,12 +30350,18 @@ fn bindgen_test_layout__GOutputVector() {
     assert_eq!(
         ::std::mem::size_of::<_GOutputVector>(),
         16usize,
-        concat!("Size of: ", stringify!(_GOutputVector))
+        concat!(
+            "Size of: ",
+            stringify!(_GOutputVector)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GOutputVector>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GOutputVector))
+        concat!(
+            "Alignment of ",
+            stringify!(_GOutputVector)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).buffer) as usize - ptr as usize },
@@ -28372,12 +30402,18 @@ fn bindgen_test_layout__GOutputMessage() {
     assert_eq!(
         ::std::mem::size_of::<_GOutputMessage>(),
         40usize,
-        concat!("Size of: ", stringify!(_GOutputMessage))
+        concat!(
+            "Size of: ",
+            stringify!(_GOutputMessage)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GOutputMessage>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GOutputMessage))
+        concat!(
+            "Alignment of ",
+            stringify!(_GOutputMessage)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).address) as usize - ptr as usize },
@@ -28571,12 +30607,18 @@ fn bindgen_test_layout__GActionInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GActionInterface>(),
         80usize,
-        concat!("Size of: ", stringify!(_GActionInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GActionInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GActionInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GActionInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GActionInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -28811,12 +30853,18 @@ fn bindgen_test_layout__GActionGroupInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GActionGroupInterface>(),
         128usize,
-        concat!("Size of: ", stringify!(_GActionGroupInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GActionGroupInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GActionGroupInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GActionGroupInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GActionGroupInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -29099,12 +31147,18 @@ fn bindgen_test_layout__GActionMapInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GActionMapInterface>(),
         40usize,
-        concat!("Size of: ", stringify!(_GActionMapInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GActionMapInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GActionMapInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GActionMapInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GActionMapInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -29172,12 +31226,18 @@ fn bindgen_test_layout__GActionEntry() {
     assert_eq!(
         ::std::mem::size_of::<_GActionEntry>(),
         64usize,
-        concat!("Size of: ", stringify!(_GActionEntry))
+        concat!(
+            "Size of: ",
+            stringify!(_GActionEntry)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GActionEntry>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GActionEntry))
+        concat!(
+            "Alignment of ",
+            stringify!(_GActionEntry)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).name) as usize - ptr as usize },
@@ -29387,12 +31447,18 @@ fn bindgen_test_layout__GAppInfoIface() {
     assert_eq!(
         ::std::mem::size_of::<_GAppInfoIface>(),
         216usize,
-        concat!("Size of: ", stringify!(_GAppInfoIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GAppInfoIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GAppInfoIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GAppInfoIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GAppInfoIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -29876,12 +31942,18 @@ fn bindgen_test_layout__GAppLaunchContext() {
     assert_eq!(
         ::std::mem::size_of::<_GAppLaunchContext>(),
         32usize,
-        concat!("Size of: ", stringify!(_GAppLaunchContext))
+        concat!(
+            "Size of: ",
+            stringify!(_GAppLaunchContext)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GAppLaunchContext>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GAppLaunchContext))
+        concat!(
+            "Alignment of ",
+            stringify!(_GAppLaunchContext)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -29954,12 +32026,18 @@ fn bindgen_test_layout__GAppLaunchContextClass() {
     assert_eq!(
         ::std::mem::size_of::<_GAppLaunchContextClass>(),
         200usize,
-        concat!("Size of: ", stringify!(_GAppLaunchContextClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GAppLaunchContextClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GAppLaunchContextClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GAppLaunchContextClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GAppLaunchContextClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -30128,12 +32206,18 @@ fn bindgen_test_layout__GApplication() {
     assert_eq!(
         ::std::mem::size_of::<_GApplication>(),
         32usize,
-        concat!("Size of: ", stringify!(_GApplication))
+        concat!(
+            "Size of: ",
+            stringify!(_GApplication)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GApplication>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GApplication))
+        concat!(
+            "Alignment of ",
+            stringify!(_GApplication)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -30224,12 +32308,18 @@ fn bindgen_test_layout__GApplicationClass() {
     assert_eq!(
         ::std::mem::size_of::<_GApplicationClass>(),
         312usize,
-        concat!("Size of: ", stringify!(_GApplicationClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GApplicationClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GApplicationClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GApplicationClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GApplicationClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -30599,12 +32689,18 @@ fn bindgen_test_layout__GApplicationCommandLine() {
     assert_eq!(
         ::std::mem::size_of::<_GApplicationCommandLine>(),
         32usize,
-        concat!("Size of: ", stringify!(_GApplicationCommandLine))
+        concat!(
+            "Size of: ",
+            stringify!(_GApplicationCommandLine)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GApplicationCommandLine>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GApplicationCommandLine))
+        concat!(
+            "Alignment of ",
+            stringify!(_GApplicationCommandLine)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -30650,12 +32746,18 @@ fn bindgen_test_layout__GApplicationCommandLineClass() {
     assert_eq!(
         ::std::mem::size_of::<_GApplicationCommandLineClass>(),
         248usize,
-        concat!("Size of: ", stringify!(_GApplicationCommandLineClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GApplicationCommandLineClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GApplicationCommandLineClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GApplicationCommandLineClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GApplicationCommandLineClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -30804,12 +32906,18 @@ fn bindgen_test_layout__GInitableIface() {
     assert_eq!(
         ::std::mem::size_of::<_GInitableIface>(),
         24usize,
-        concat!("Size of: ", stringify!(_GInitableIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GInitableIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInitableIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInitableIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInitableIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -30898,12 +33006,18 @@ fn bindgen_test_layout__GAsyncInitableIface() {
     assert_eq!(
         ::std::mem::size_of::<_GAsyncInitableIface>(),
         32usize,
-        concat!("Size of: ", stringify!(_GAsyncInitableIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GAsyncInitableIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GAsyncInitableIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GAsyncInitableIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GAsyncInitableIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -31015,12 +33129,18 @@ fn bindgen_test_layout__GAsyncResultIface() {
     assert_eq!(
         ::std::mem::size_of::<_GAsyncResultIface>(),
         40usize,
-        concat!("Size of: ", stringify!(_GAsyncResultIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GAsyncResultIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GAsyncResultIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GAsyncResultIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GAsyncResultIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -31101,12 +33221,18 @@ fn bindgen_test_layout__GInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GInputStream>(),
         32usize,
-        concat!("Size of: ", stringify!(_GInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -31221,12 +33347,18 @@ fn bindgen_test_layout__GInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GInputStreamClass>(),
         248usize,
-        concat!("Size of: ", stringify!(_GInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -31540,12 +33672,18 @@ fn bindgen_test_layout__GFilterInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GFilterInputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GFilterInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GFilterInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFilterInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFilterInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFilterInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -31584,12 +33722,18 @@ fn bindgen_test_layout__GFilterInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFilterInputStreamClass>(),
         272usize,
-        concat!("Size of: ", stringify!(_GFilterInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFilterInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFilterInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFilterInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFilterInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -31671,12 +33815,18 @@ fn bindgen_test_layout__GBufferedInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GBufferedInputStream>(),
         48usize,
-        concat!("Size of: ", stringify!(_GBufferedInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GBufferedInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GBufferedInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GBufferedInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GBufferedInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -31742,12 +33892,18 @@ fn bindgen_test_layout__GBufferedInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GBufferedInputStreamClass>(),
         336usize,
-        concat!("Size of: ", stringify!(_GBufferedInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GBufferedInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GBufferedInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GBufferedInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GBufferedInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -31927,12 +34083,18 @@ fn bindgen_test_layout__GOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GOutputStream>(),
         32usize,
-        concat!("Size of: ", stringify!(_GOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -32101,12 +34263,18 @@ fn bindgen_test_layout__GOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GOutputStreamClass>(),
         296usize,
-        concat!("Size of: ", stringify!(_GOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -32586,12 +34754,18 @@ fn bindgen_test_layout__GFilterOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GFilterOutputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GFilterOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GFilterOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFilterOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFilterOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFilterOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -32630,12 +34804,18 @@ fn bindgen_test_layout__GFilterOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFilterOutputStreamClass>(),
         320usize,
-        concat!("Size of: ", stringify!(_GFilterOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFilterOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFilterOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFilterOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFilterOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -32718,12 +34898,18 @@ fn bindgen_test_layout__GBufferedOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GBufferedOutputStream>(),
         48usize,
-        concat!("Size of: ", stringify!(_GBufferedOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GBufferedOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GBufferedOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GBufferedOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GBufferedOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -32761,12 +34947,18 @@ fn bindgen_test_layout__GBufferedOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GBufferedOutputStreamClass>(),
         336usize,
-        concat!("Size of: ", stringify!(_GBufferedOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GBufferedOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GBufferedOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GBufferedOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GBufferedOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -32858,12 +35050,18 @@ fn bindgen_test_layout__GCancellable() {
     assert_eq!(
         ::std::mem::size_of::<_GCancellable>(),
         32usize,
-        concat!("Size of: ", stringify!(_GCancellable))
+        concat!(
+            "Size of: ",
+            stringify!(_GCancellable)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GCancellable>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GCancellable))
+        concat!(
+            "Alignment of ",
+            stringify!(_GCancellable)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -32904,12 +35102,18 @@ fn bindgen_test_layout__GCancellableClass() {
     assert_eq!(
         ::std::mem::size_of::<_GCancellableClass>(),
         184usize,
-        concat!("Size of: ", stringify!(_GCancellableClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GCancellableClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GCancellableClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GCancellableClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GCancellableClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -33065,12 +35269,18 @@ fn bindgen_test_layout__GConverterIface() {
     assert_eq!(
         ::std::mem::size_of::<_GConverterIface>(),
         32usize,
-        concat!("Size of: ", stringify!(_GConverterIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GConverterIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GConverterIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GConverterIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GConverterIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -33136,12 +35346,18 @@ fn bindgen_test_layout__GCharsetConverterClass() {
     assert_eq!(
         ::std::mem::size_of::<_GCharsetConverterClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GCharsetConverterClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GCharsetConverterClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GCharsetConverterClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GCharsetConverterClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GCharsetConverterClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -33250,12 +35466,18 @@ fn bindgen_test_layout__GConverterInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GConverterInputStream>(),
         48usize,
-        concat!("Size of: ", stringify!(_GConverterInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GConverterInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GConverterInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GConverterInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GConverterInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -33296,12 +35518,18 @@ fn bindgen_test_layout__GConverterInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GConverterInputStreamClass>(),
         312usize,
-        concat!("Size of: ", stringify!(_GConverterInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GConverterInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GConverterInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GConverterInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GConverterInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -33399,12 +35627,18 @@ fn bindgen_test_layout__GConverterOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GConverterOutputStream>(),
         48usize,
-        concat!("Size of: ", stringify!(_GConverterOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GConverterOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GConverterOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GConverterOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GConverterOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -33445,12 +35679,18 @@ fn bindgen_test_layout__GConverterOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GConverterOutputStreamClass>(),
         360usize,
-        concat!("Size of: ", stringify!(_GConverterOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GConverterOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GConverterOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GConverterOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GConverterOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -34128,12 +36368,18 @@ fn bindgen_test_layout__GDatagramBasedInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GDatagramBasedInterface>(),
         56usize,
-        concat!("Size of: ", stringify!(_GDatagramBasedInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDatagramBasedInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDatagramBasedInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDatagramBasedInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDatagramBasedInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -34263,12 +36509,18 @@ fn bindgen_test_layout__GDataInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GDataInputStream>(),
         56usize,
-        concat!("Size of: ", stringify!(_GDataInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GDataInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDataInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDataInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDataInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -34309,12 +36561,18 @@ fn bindgen_test_layout__GDataInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDataInputStreamClass>(),
         376usize,
-        concat!("Size of: ", stringify!(_GDataInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDataInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDataInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDataInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDataInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -34572,12 +36830,18 @@ fn bindgen_test_layout__GDataOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GDataOutputStream>(),
         48usize,
-        concat!("Size of: ", stringify!(_GDataOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GDataOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDataOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDataOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDataOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -34618,12 +36882,18 @@ fn bindgen_test_layout__GDataOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDataOutputStreamClass>(),
         360usize,
-        concat!("Size of: ", stringify!(_GDataOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDataOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDataOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDataOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDataOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -35176,12 +37446,18 @@ fn bindgen_test_layout__GDBusInterfaceVTable() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusInterfaceVTable>(),
         88usize,
-        concat!("Size of: ", stringify!(_GDBusInterfaceVTable))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusInterfaceVTable)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusInterfaceVTable>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusInterfaceVTable))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusInterfaceVTable)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).method_call) as usize - ptr as usize },
@@ -35295,12 +37571,18 @@ fn bindgen_test_layout__GDBusSubtreeVTable() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusSubtreeVTable>(),
         88usize,
-        concat!("Size of: ", stringify!(_GDBusSubtreeVTable))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusSubtreeVTable)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusSubtreeVTable>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusSubtreeVTable))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusSubtreeVTable)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).enumerate) as usize - ptr as usize },
@@ -35435,12 +37717,18 @@ fn bindgen_test_layout__GDBusErrorEntry() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusErrorEntry>(),
         16usize,
-        concat!("Size of: ", stringify!(_GDBusErrorEntry))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusErrorEntry)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusErrorEntry>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusErrorEntry))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusErrorEntry)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).error_code) as usize - ptr as usize },
@@ -35537,12 +37825,18 @@ fn bindgen_test_layout__GDBusInterfaceIface() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusInterfaceIface>(),
         48usize,
-        concat!("Size of: ", stringify!(_GDBusInterfaceIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusInterfaceIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusInterfaceIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusInterfaceIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusInterfaceIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_iface) as usize - ptr as usize },
@@ -35631,12 +37925,18 @@ fn bindgen_test_layout__GDBusInterfaceSkeleton() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusInterfaceSkeleton>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusInterfaceSkeleton))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusInterfaceSkeleton)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusInterfaceSkeleton>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusInterfaceSkeleton))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusInterfaceSkeleton)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -35690,12 +37990,18 @@ fn bindgen_test_layout__GDBusInterfaceSkeletonClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusInterfaceSkeletonClass>(),
         304usize,
-        concat!("Size of: ", stringify!(_GDBusInterfaceSkeletonClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusInterfaceSkeletonClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusInterfaceSkeletonClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusInterfaceSkeletonClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusInterfaceSkeletonClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -35863,12 +38169,18 @@ fn bindgen_test_layout__GDBusAnnotationInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusAnnotationInfo>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusAnnotationInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusAnnotationInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusAnnotationInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusAnnotationInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusAnnotationInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -35926,12 +38238,18 @@ fn bindgen_test_layout__GDBusArgInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusArgInfo>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusArgInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusArgInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusArgInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusArgInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusArgInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -35990,12 +38308,18 @@ fn bindgen_test_layout__GDBusMethodInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusMethodInfo>(),
         40usize,
-        concat!("Size of: ", stringify!(_GDBusMethodInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusMethodInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusMethodInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusMethodInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusMethodInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -36063,12 +38387,18 @@ fn bindgen_test_layout__GDBusSignalInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusSignalInfo>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusSignalInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusSignalInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusSignalInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusSignalInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusSignalInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -36127,12 +38457,18 @@ fn bindgen_test_layout__GDBusPropertyInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusPropertyInfo>(),
         40usize,
-        concat!("Size of: ", stringify!(_GDBusPropertyInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusPropertyInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusPropertyInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusPropertyInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusPropertyInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -36202,12 +38538,18 @@ fn bindgen_test_layout__GDBusInterfaceInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusInterfaceInfo>(),
         48usize,
-        concat!("Size of: ", stringify!(_GDBusInterfaceInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusInterfaceInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusInterfaceInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusInterfaceInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusInterfaceInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -36286,12 +38628,18 @@ fn bindgen_test_layout__GDBusNodeInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusNodeInfo>(),
         40usize,
-        concat!("Size of: ", stringify!(_GDBusNodeInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusNodeInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusNodeInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusNodeInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusNodeInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -36932,12 +39280,18 @@ fn bindgen_test_layout__GDBusObjectIface() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectIface>(),
         56usize,
-        concat!("Size of: ", stringify!(_GDBusObjectIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_iface) as usize - ptr as usize },
@@ -37067,12 +39421,18 @@ fn bindgen_test_layout__GDBusObjectManagerIface() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectManagerIface>(),
         80usize,
-        concat!("Size of: ", stringify!(_GDBusObjectManagerIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectManagerIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectManagerIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectManagerIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectManagerIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_iface) as usize - ptr as usize },
@@ -37208,12 +39568,18 @@ fn bindgen_test_layout__GDBusObjectManagerClient() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectManagerClient>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusObjectManagerClient))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectManagerClient)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectManagerClient>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectManagerClient))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectManagerClient)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -37269,12 +39635,18 @@ fn bindgen_test_layout__GDBusObjectManagerClientClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectManagerClientClass>(),
         216usize,
-        concat!("Size of: ", stringify!(_GDBusObjectManagerClientClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectManagerClientClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectManagerClientClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectManagerClientClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectManagerClientClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -37429,12 +39801,18 @@ fn bindgen_test_layout__GDBusObjectManagerServer() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectManagerServer>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusObjectManagerServer))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectManagerServer)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectManagerServer>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectManagerServer))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectManagerServer)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -37471,12 +39849,18 @@ fn bindgen_test_layout__GDBusObjectManagerServerClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectManagerServerClass>(),
         200usize,
-        concat!("Size of: ", stringify!(_GDBusObjectManagerServerClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectManagerServerClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectManagerServerClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectManagerServerClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectManagerServerClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -37562,12 +39946,18 @@ fn bindgen_test_layout__GDBusObjectProxy() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectProxy>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusObjectProxy))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectProxy)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectProxy>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectProxy))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectProxy)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -37604,12 +39994,18 @@ fn bindgen_test_layout__GDBusObjectProxyClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectProxyClass>(),
         200usize,
-        concat!("Size of: ", stringify!(_GDBusObjectProxyClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectProxyClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectProxyClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectProxyClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectProxyClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -37665,12 +40061,18 @@ fn bindgen_test_layout__GDBusObjectSkeleton() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectSkeleton>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusObjectSkeleton))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectSkeleton)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectSkeleton>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectSkeleton))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectSkeleton)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -37714,12 +40116,18 @@ fn bindgen_test_layout__GDBusObjectSkeletonClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusObjectSkeletonClass>(),
         208usize,
-        concat!("Size of: ", stringify!(_GDBusObjectSkeletonClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusObjectSkeletonClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusObjectSkeletonClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusObjectSkeletonClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusObjectSkeletonClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -37805,12 +40213,18 @@ fn bindgen_test_layout__GDBusProxy() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusProxy>(),
         32usize,
-        concat!("Size of: ", stringify!(_GDBusProxy))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusProxy)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusProxy>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusProxy))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusProxy)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -37861,12 +40275,18 @@ fn bindgen_test_layout__GDBusProxyClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDBusProxyClass>(),
         408usize,
-        concat!("Size of: ", stringify!(_GDBusProxyClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDBusProxyClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDBusProxyClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDBusProxyClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDBusProxyClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -38181,12 +40601,18 @@ fn bindgen_test_layout__GDebugControllerInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GDebugControllerInterface>(),
         16usize,
-        concat!("Size of: ", stringify!(_GDebugControllerInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDebugControllerInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDebugControllerInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDebugControllerInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDebugControllerInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -38226,12 +40652,18 @@ fn bindgen_test_layout__GDebugControllerDBus() {
     assert_eq!(
         ::std::mem::size_of::<_GDebugControllerDBus>(),
         24usize,
-        concat!("Size of: ", stringify!(_GDebugControllerDBus))
+        concat!(
+            "Size of: ",
+            stringify!(_GDebugControllerDBus)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDebugControllerDBus>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDebugControllerDBus))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDebugControllerDBus)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -38272,12 +40704,18 @@ fn bindgen_test_layout__GDebugControllerDBusClass() {
     assert_eq!(
         ::std::mem::size_of::<_GDebugControllerDBusClass>(),
         240usize,
-        concat!("Size of: ", stringify!(_GDebugControllerDBusClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GDebugControllerDBusClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDebugControllerDBusClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDebugControllerDBusClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDebugControllerDBusClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -38453,12 +40891,18 @@ fn bindgen_test_layout__GDriveIface() {
     assert_eq!(
         ::std::mem::size_of::<_GDriveIface>(),
         272usize,
-        concat!("Size of: ", stringify!(_GDriveIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDriveIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDriveIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDriveIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDriveIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -39017,12 +41461,18 @@ fn bindgen_test_layout__GDtlsConnectionInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GDtlsConnectionInterface>(),
         96usize,
-        concat!("Size of: ", stringify!(_GDtlsConnectionInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDtlsConnectionInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDtlsConnectionInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDtlsConnectionInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDtlsConnectionInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -39311,12 +41761,18 @@ fn bindgen_test_layout__GDtlsClientConnectionInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GDtlsClientConnectionInterface>(),
         16usize,
-        concat!("Size of: ", stringify!(_GDtlsClientConnectionInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDtlsClientConnectionInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDtlsClientConnectionInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDtlsClientConnectionInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDtlsClientConnectionInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -39380,12 +41836,18 @@ fn bindgen_test_layout__GDtlsServerConnectionInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GDtlsServerConnectionInterface>(),
         16usize,
-        concat!("Size of: ", stringify!(_GDtlsServerConnectionInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GDtlsServerConnectionInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GDtlsServerConnectionInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GDtlsServerConnectionInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GDtlsServerConnectionInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -39441,12 +41903,18 @@ fn bindgen_test_layout__GIconIface() {
     assert_eq!(
         ::std::mem::size_of::<_GIconIface>(),
         56usize,
-        concat!("Size of: ", stringify!(_GIconIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GIconIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GIconIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GIconIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GIconIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -39578,12 +42046,18 @@ fn bindgen_test_layout__GEmblemedIcon() {
     assert_eq!(
         ::std::mem::size_of::<_GEmblemedIcon>(),
         32usize,
-        concat!("Size of: ", stringify!(_GEmblemedIcon))
+        concat!(
+            "Size of: ",
+            stringify!(_GEmblemedIcon)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GEmblemedIcon>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GEmblemedIcon))
+        concat!(
+            "Alignment of ",
+            stringify!(_GEmblemedIcon)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -39618,12 +42092,18 @@ fn bindgen_test_layout__GEmblemedIconClass() {
     assert_eq!(
         ::std::mem::size_of::<_GEmblemedIconClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GEmblemedIconClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GEmblemedIconClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GEmblemedIconClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GEmblemedIconClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GEmblemedIconClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -40437,12 +42917,18 @@ fn bindgen_test_layout__GFileIface() {
     assert_eq!(
         ::std::mem::size_of::<_GFileIface>(),
         840usize,
-        concat!("Size of: ", stringify!(_GFileIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -42610,12 +45096,18 @@ fn bindgen_test_layout__GFileAttributeInfo() {
     assert_eq!(
         ::std::mem::size_of::<_GFileAttributeInfo>(),
         16usize,
-        concat!("Size of: ", stringify!(_GFileAttributeInfo))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileAttributeInfo)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileAttributeInfo>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileAttributeInfo))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileAttributeInfo)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).name) as usize - ptr as usize },
@@ -42662,12 +45154,18 @@ fn bindgen_test_layout__GFileAttributeInfoList() {
     assert_eq!(
         ::std::mem::size_of::<_GFileAttributeInfoList>(),
         16usize,
-        concat!("Size of: ", stringify!(_GFileAttributeInfoList))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileAttributeInfoList)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileAttributeInfoList>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileAttributeInfoList))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileAttributeInfoList)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).infos) as usize - ptr as usize },
@@ -42743,12 +45241,18 @@ fn bindgen_test_layout__GFileEnumerator() {
     assert_eq!(
         ::std::mem::size_of::<_GFileEnumerator>(),
         32usize,
-        concat!("Size of: ", stringify!(_GFileEnumerator))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileEnumerator)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileEnumerator>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileEnumerator))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileEnumerator)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -42838,12 +45342,18 @@ fn bindgen_test_layout__GFileEnumeratorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFileEnumeratorClass>(),
         240usize,
-        concat!("Size of: ", stringify!(_GFileEnumeratorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileEnumeratorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileEnumeratorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileEnumeratorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileEnumeratorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -43475,12 +45985,18 @@ fn bindgen_test_layout__GFileInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GFileInputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GFileInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -43558,12 +46074,18 @@ fn bindgen_test_layout__GFileInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFileInputStreamClass>(),
         336usize,
-        concat!("Size of: ", stringify!(_GFileInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -43743,12 +46265,18 @@ fn bindgen_test_layout__GIOStream() {
     assert_eq!(
         ::std::mem::size_of::<_GIOStream>(),
         32usize,
-        concat!("Size of: ", stringify!(_GIOStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GIOStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GIOStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GIOStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GIOStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -43820,12 +46348,18 @@ fn bindgen_test_layout__GIOStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GIOStreamClass>(),
         256usize,
-        concat!("Size of: ", stringify!(_GIOStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GIOStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GIOStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GIOStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GIOStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -44069,12 +46603,18 @@ fn bindgen_test_layout__GFileIOStream() {
     assert_eq!(
         ::std::mem::size_of::<_GFileIOStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GFileIOStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileIOStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileIOStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileIOStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileIOStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -44164,12 +46704,18 @@ fn bindgen_test_layout__GFileIOStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFileIOStreamClass>(),
         368usize,
-        concat!("Size of: ", stringify!(_GFileIOStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileIOStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileIOStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileIOStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileIOStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -44373,12 +46919,18 @@ fn bindgen_test_layout__GFileMonitor() {
     assert_eq!(
         ::std::mem::size_of::<_GFileMonitor>(),
         32usize,
-        concat!("Size of: ", stringify!(_GFileMonitor))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileMonitor)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileMonitor>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileMonitor))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileMonitor)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -44427,12 +46979,18 @@ fn bindgen_test_layout__GFileMonitorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFileMonitorClass>(),
         192usize,
-        concat!("Size of: ", stringify!(_GFileMonitorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileMonitorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileMonitorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileMonitorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileMonitorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -44554,12 +47112,18 @@ fn bindgen_test_layout__GFilenameCompleterClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFilenameCompleterClass>(),
         168usize,
-        concat!("Size of: ", stringify!(_GFilenameCompleterClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFilenameCompleterClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFilenameCompleterClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFilenameCompleterClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFilenameCompleterClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -44656,12 +47220,18 @@ fn bindgen_test_layout__GFileOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GFileOutputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GFileOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -44753,12 +47323,18 @@ fn bindgen_test_layout__GFileOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GFileOutputStreamClass>(),
         408usize,
-        concat!("Size of: ", stringify!(_GFileOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GFileOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GFileOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GFileOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GFileOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -44964,12 +47540,18 @@ fn bindgen_test_layout__GInetAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GInetAddress>(),
         32usize,
-        concat!("Size of: ", stringify!(_GInetAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GInetAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInetAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInetAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInetAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -45008,12 +47590,18 @@ fn bindgen_test_layout__GInetAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GInetAddressClass>(),
         152usize,
-        concat!("Size of: ", stringify!(_GInetAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GInetAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInetAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInetAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInetAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -45132,12 +47720,18 @@ fn bindgen_test_layout__GInetAddressMask() {
     assert_eq!(
         ::std::mem::size_of::<_GInetAddressMask>(),
         32usize,
-        concat!("Size of: ", stringify!(_GInetAddressMask))
+        concat!(
+            "Size of: ",
+            stringify!(_GInetAddressMask)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInetAddressMask>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInetAddressMask))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInetAddressMask)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -45173,12 +47767,18 @@ fn bindgen_test_layout__GInetAddressMaskClass() {
     assert_eq!(
         ::std::mem::size_of::<_GInetAddressMaskClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GInetAddressMaskClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GInetAddressMaskClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInetAddressMaskClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInetAddressMaskClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInetAddressMaskClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -45244,12 +47844,18 @@ fn bindgen_test_layout__GSocketAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketAddress>(),
         24usize,
-        concat!("Size of: ", stringify!(_GSocketAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -45286,12 +47892,18 @@ fn bindgen_test_layout__GSocketAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketAddressClass>(),
         160usize,
-        concat!("Size of: ", stringify!(_GSocketAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -45374,12 +47986,18 @@ fn bindgen_test_layout__GInetSocketAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GInetSocketAddress>(),
         32usize,
-        concat!("Size of: ", stringify!(_GInetSocketAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GInetSocketAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInetSocketAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInetSocketAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInetSocketAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -45415,12 +48033,18 @@ fn bindgen_test_layout__GInetSocketAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GInetSocketAddressClass>(),
         160usize,
-        concat!("Size of: ", stringify!(_GInetSocketAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GInetSocketAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GInetSocketAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GInetSocketAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GInetSocketAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -45871,12 +48495,18 @@ fn bindgen_test_layout__GListModelInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GListModelInterface>(),
         40usize,
-        concat!("Size of: ", stringify!(_GListModelInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GListModelInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GListModelInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GListModelInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GListModelInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -45960,12 +48590,18 @@ fn bindgen_test_layout_GListStoreClass() {
     assert_eq!(
         ::std::mem::size_of::<GListStoreClass>(),
         136usize,
-        concat!("Size of: ", stringify!(GListStoreClass))
+        concat!(
+            "Size of: ",
+            stringify!(GListStoreClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<GListStoreClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(GListStoreClass))
+        concat!(
+            "Alignment of ",
+            stringify!(GListStoreClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -46088,12 +48724,18 @@ fn bindgen_test_layout__GLoadableIconIface() {
     assert_eq!(
         ::std::mem::size_of::<_GLoadableIconIface>(),
         40usize,
-        concat!("Size of: ", stringify!(_GLoadableIconIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GLoadableIconIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GLoadableIconIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GLoadableIconIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GLoadableIconIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -46185,12 +48827,18 @@ fn bindgen_test_layout__GMemoryInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GMemoryInputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GMemoryInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GMemoryInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMemoryInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMemoryInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMemoryInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -46231,12 +48879,18 @@ fn bindgen_test_layout__GMemoryInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GMemoryInputStreamClass>(),
         288usize,
-        concat!("Size of: ", stringify!(_GMemoryInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GMemoryInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMemoryInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMemoryInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMemoryInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -46356,12 +49010,18 @@ fn bindgen_test_layout__GMemoryMonitorInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GMemoryMonitorInterface>(),
         24usize,
-        concat!("Size of: ", stringify!(_GMemoryMonitorInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GMemoryMonitorInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMemoryMonitorInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMemoryMonitorInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMemoryMonitorInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -46407,12 +49067,18 @@ fn bindgen_test_layout__GMemoryOutputStream() {
     assert_eq!(
         ::std::mem::size_of::<_GMemoryOutputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_GMemoryOutputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_GMemoryOutputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMemoryOutputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMemoryOutputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMemoryOutputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -46453,12 +49119,18 @@ fn bindgen_test_layout__GMemoryOutputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_GMemoryOutputStreamClass>(),
         336usize,
-        concat!("Size of: ", stringify!(_GMemoryOutputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GMemoryOutputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMemoryOutputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMemoryOutputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMemoryOutputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -46588,12 +49260,18 @@ fn bindgen_test_layout__GMenuModel() {
     assert_eq!(
         ::std::mem::size_of::<_GMenuModel>(),
         32usize,
-        concat!("Size of: ", stringify!(_GMenuModel))
+        concat!(
+            "Size of: ",
+            stringify!(_GMenuModel)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMenuModel>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMenuModel))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMenuModel)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -46661,12 +49339,18 @@ fn bindgen_test_layout__GMenuModelClass() {
     assert_eq!(
         ::std::mem::size_of::<_GMenuModelClass>(),
         200usize,
-        concat!("Size of: ", stringify!(_GMenuModelClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GMenuModelClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMenuModelClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMenuModelClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMenuModelClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -46825,12 +49509,18 @@ fn bindgen_test_layout__GMenuAttributeIter() {
     assert_eq!(
         ::std::mem::size_of::<_GMenuAttributeIter>(),
         32usize,
-        concat!("Size of: ", stringify!(_GMenuAttributeIter))
+        concat!(
+            "Size of: ",
+            stringify!(_GMenuAttributeIter)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMenuAttributeIter>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMenuAttributeIter))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMenuAttributeIter)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -46873,12 +49563,18 @@ fn bindgen_test_layout__GMenuAttributeIterClass() {
     assert_eq!(
         ::std::mem::size_of::<_GMenuAttributeIterClass>(),
         144usize,
-        concat!("Size of: ", stringify!(_GMenuAttributeIterClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GMenuAttributeIterClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMenuAttributeIterClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMenuAttributeIterClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMenuAttributeIterClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -46933,12 +49629,18 @@ fn bindgen_test_layout__GMenuLinkIter() {
     assert_eq!(
         ::std::mem::size_of::<_GMenuLinkIter>(),
         32usize,
-        concat!("Size of: ", stringify!(_GMenuLinkIter))
+        concat!(
+            "Size of: ",
+            stringify!(_GMenuLinkIter)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMenuLinkIter>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMenuLinkIter))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMenuLinkIter)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -46980,12 +49682,18 @@ fn bindgen_test_layout__GMenuLinkIterClass() {
     assert_eq!(
         ::std::mem::size_of::<_GMenuLinkIterClass>(),
         144usize,
-        concat!("Size of: ", stringify!(_GMenuLinkIterClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GMenuLinkIterClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMenuLinkIterClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMenuLinkIterClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMenuLinkIterClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -47350,12 +50058,18 @@ fn bindgen_test_layout__GMountIface() {
     assert_eq!(
         ::std::mem::size_of::<_GMountIface>(),
         232usize,
-        concat!("Size of: ", stringify!(_GMountIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GMountIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMountIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMountIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMountIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -47812,12 +50526,18 @@ fn bindgen_test_layout__GMountOperation() {
     assert_eq!(
         ::std::mem::size_of::<_GMountOperation>(),
         32usize,
-        concat!("Size of: ", stringify!(_GMountOperation))
+        concat!(
+            "Size of: ",
+            stringify!(_GMountOperation)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMountOperation>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMountOperation))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMountOperation)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -47898,12 +50618,18 @@ fn bindgen_test_layout__GMountOperationClass() {
     assert_eq!(
         ::std::mem::size_of::<_GMountOperationClass>(),
         256usize,
-        concat!("Size of: ", stringify!(_GMountOperationClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GMountOperationClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GMountOperationClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GMountOperationClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GMountOperationClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -48169,12 +50895,18 @@ fn bindgen_test_layout__GNativeSocketAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GNativeSocketAddress>(),
         32usize,
-        concat!("Size of: ", stringify!(_GNativeSocketAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GNativeSocketAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNativeSocketAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNativeSocketAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNativeSocketAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -48210,12 +50942,18 @@ fn bindgen_test_layout__GNativeSocketAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GNativeSocketAddressClass>(),
         160usize,
-        concat!("Size of: ", stringify!(_GNativeSocketAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GNativeSocketAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNativeSocketAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNativeSocketAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNativeSocketAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -48248,12 +50986,18 @@ fn bindgen_test_layout__GVolumeMonitor() {
     assert_eq!(
         ::std::mem::size_of::<_GVolumeMonitor>(),
         32usize,
-        concat!("Size of: ", stringify!(_GVolumeMonitor))
+        concat!(
+            "Size of: ",
+            stringify!(_GVolumeMonitor)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVolumeMonitor>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVolumeMonitor))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVolumeMonitor)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -48358,12 +51102,18 @@ fn bindgen_test_layout__GVolumeMonitorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GVolumeMonitorClass>(),
         336usize,
-        concat!("Size of: ", stringify!(_GVolumeMonitorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GVolumeMonitorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVolumeMonitorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVolumeMonitorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVolumeMonitorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -48672,12 +51422,18 @@ fn bindgen_test_layout__GNativeVolumeMonitor() {
     assert_eq!(
         ::std::mem::size_of::<_GNativeVolumeMonitor>(),
         32usize,
-        concat!("Size of: ", stringify!(_GNativeVolumeMonitor))
+        concat!(
+            "Size of: ",
+            stringify!(_GNativeVolumeMonitor)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNativeVolumeMonitor>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNativeVolumeMonitor))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNativeVolumeMonitor)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -48709,12 +51465,18 @@ fn bindgen_test_layout__GNativeVolumeMonitorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GNativeVolumeMonitorClass>(),
         344usize,
-        concat!("Size of: ", stringify!(_GNativeVolumeMonitorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GNativeVolumeMonitorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNativeVolumeMonitorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNativeVolumeMonitorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNativeVolumeMonitorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -48760,12 +51522,18 @@ fn bindgen_test_layout__GNetworkAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GNetworkAddress>(),
         32usize,
-        concat!("Size of: ", stringify!(_GNetworkAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GNetworkAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNetworkAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNetworkAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNetworkAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -48801,12 +51569,18 @@ fn bindgen_test_layout__GNetworkAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GNetworkAddressClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GNetworkAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GNetworkAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNetworkAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNetworkAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNetworkAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -48892,12 +51666,18 @@ fn bindgen_test_layout__GNetworkMonitorInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GNetworkMonitorInterface>(),
         48usize,
-        concat!("Size of: ", stringify!(_GNetworkMonitorInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GNetworkMonitorInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNetworkMonitorInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNetworkMonitorInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNetworkMonitorInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -49011,12 +51791,18 @@ fn bindgen_test_layout__GNetworkService() {
     assert_eq!(
         ::std::mem::size_of::<_GNetworkService>(),
         32usize,
-        concat!("Size of: ", stringify!(_GNetworkService))
+        concat!(
+            "Size of: ",
+            stringify!(_GNetworkService)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNetworkService>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNetworkService))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNetworkService)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -49052,12 +51838,18 @@ fn bindgen_test_layout__GNetworkServiceClass() {
     assert_eq!(
         ::std::mem::size_of::<_GNetworkServiceClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GNetworkServiceClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GNetworkServiceClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GNetworkServiceClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GNetworkServiceClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GNetworkServiceClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -49187,12 +51979,18 @@ fn bindgen_test_layout__GPermission() {
     assert_eq!(
         ::std::mem::size_of::<_GPermission>(),
         32usize,
-        concat!("Size of: ", stringify!(_GPermission))
+        concat!(
+            "Size of: ",
+            stringify!(_GPermission)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPermission>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPermission))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPermission)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -49272,12 +52070,18 @@ fn bindgen_test_layout__GPermissionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GPermissionClass>(),
         312usize,
-        concat!("Size of: ", stringify!(_GPermissionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GPermissionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPermissionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPermissionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPermissionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -49456,12 +52260,18 @@ fn bindgen_test_layout__GPollableInputStreamInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GPollableInputStreamInterface>(),
         48usize,
-        concat!("Size of: ", stringify!(_GPollableInputStreamInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GPollableInputStreamInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPollableInputStreamInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPollableInputStreamInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPollableInputStreamInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -49579,12 +52389,18 @@ fn bindgen_test_layout__GPollableOutputStreamInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GPollableOutputStreamInterface>(),
         56usize,
-        concat!("Size of: ", stringify!(_GPollableOutputStreamInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GPollableOutputStreamInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPollableOutputStreamInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPollableOutputStreamInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPollableOutputStreamInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -49749,12 +52565,18 @@ fn bindgen_test_layout__GPowerProfileMonitorInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GPowerProfileMonitorInterface>(),
         16usize,
-        concat!("Size of: ", stringify!(_GPowerProfileMonitorInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GPowerProfileMonitorInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GPowerProfileMonitorInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GPowerProfileMonitorInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GPowerProfileMonitorInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -49826,12 +52648,18 @@ fn bindgen_test_layout__GProxyInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GProxyInterface>(),
         48usize,
-        concat!("Size of: ", stringify!(_GProxyInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GProxyInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GProxyInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GProxyInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GProxyInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -49939,12 +52767,18 @@ fn bindgen_test_layout__GProxyAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GProxyAddress>(),
         40usize,
-        concat!("Size of: ", stringify!(_GProxyAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GProxyAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GProxyAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GProxyAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GProxyAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -49979,12 +52813,18 @@ fn bindgen_test_layout__GProxyAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GProxyAddressClass>(),
         160usize,
-        concat!("Size of: ", stringify!(_GProxyAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GProxyAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GProxyAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GProxyAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GProxyAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -50046,12 +52886,18 @@ fn bindgen_test_layout__GSocketAddressEnumerator() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketAddressEnumerator>(),
         24usize,
-        concat!("Size of: ", stringify!(_GSocketAddressEnumerator))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketAddressEnumerator)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketAddressEnumerator>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketAddressEnumerator))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketAddressEnumerator)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -50099,12 +52945,18 @@ fn bindgen_test_layout__GSocketAddressEnumeratorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketAddressEnumeratorClass>(),
         160usize,
-        concat!("Size of: ", stringify!(_GSocketAddressEnumeratorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketAddressEnumeratorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketAddressEnumeratorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketAddressEnumeratorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketAddressEnumeratorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -50193,12 +53045,18 @@ fn bindgen_test_layout__GProxyAddressEnumerator() {
     assert_eq!(
         ::std::mem::size_of::<_GProxyAddressEnumerator>(),
         32usize,
-        concat!("Size of: ", stringify!(_GProxyAddressEnumerator))
+        concat!(
+            "Size of: ",
+            stringify!(_GProxyAddressEnumerator)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GProxyAddressEnumerator>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GProxyAddressEnumerator))
+        concat!(
+            "Alignment of ",
+            stringify!(_GProxyAddressEnumerator)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -50241,12 +53099,18 @@ fn bindgen_test_layout__GProxyAddressEnumeratorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GProxyAddressEnumeratorClass>(),
         216usize,
-        concat!("Size of: ", stringify!(_GProxyAddressEnumeratorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GProxyAddressEnumeratorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GProxyAddressEnumeratorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GProxyAddressEnumeratorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GProxyAddressEnumeratorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -50372,12 +53236,18 @@ fn bindgen_test_layout__GProxyResolverInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GProxyResolverInterface>(),
         48usize,
-        concat!("Size of: ", stringify!(_GProxyResolverInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GProxyResolverInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GProxyResolverInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GProxyResolverInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GProxyResolverInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -50493,12 +53363,18 @@ fn bindgen_test_layout__GRemoteActionGroupInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GRemoteActionGroupInterface>(),
         32usize,
-        concat!("Size of: ", stringify!(_GRemoteActionGroupInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GRemoteActionGroupInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GRemoteActionGroupInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GRemoteActionGroupInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GRemoteActionGroupInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -50570,12 +53446,18 @@ fn bindgen_test_layout__GResolver() {
     assert_eq!(
         ::std::mem::size_of::<_GResolver>(),
         32usize,
-        concat!("Size of: ", stringify!(_GResolver))
+        concat!(
+            "Size of: ",
+            stringify!(_GResolver)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GResolver>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GResolver))
+        concat!(
+            "Alignment of ",
+            stringify!(_GResolver)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -50742,12 +53624,18 @@ fn bindgen_test_layout__GResolverClass() {
     assert_eq!(
         ::std::mem::size_of::<_GResolverClass>(),
         264usize,
-        concat!("Size of: ", stringify!(_GResolverClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GResolverClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GResolverClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GResolverClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GResolverClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -51090,12 +53978,18 @@ fn bindgen_test_layout__GStaticResource() {
     assert_eq!(
         ::std::mem::size_of::<_GStaticResource>(),
         40usize,
-        concat!("Size of: ", stringify!(_GStaticResource))
+        concat!(
+            "Size of: ",
+            stringify!(_GStaticResource)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GStaticResource>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GStaticResource))
+        concat!(
+            "Alignment of ",
+            stringify!(_GStaticResource)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -51276,12 +54170,18 @@ fn bindgen_test_layout__GSeekableIface() {
     assert_eq!(
         ::std::mem::size_of::<_GSeekableIface>(),
         56usize,
-        concat!("Size of: ", stringify!(_GSeekableIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GSeekableIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSeekableIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSeekableIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSeekableIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -51527,12 +54427,18 @@ fn bindgen_test_layout__GSettingsClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSettingsClass>(),
         328usize,
-        concat!("Size of: ", stringify!(_GSettingsClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSettingsClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSettingsClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSettingsClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSettingsClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -51608,12 +54514,18 @@ fn bindgen_test_layout__GSettings() {
     assert_eq!(
         ::std::mem::size_of::<_GSettings>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSettings))
+        concat!(
+            "Size of: ",
+            stringify!(_GSettings)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSettings>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSettings))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSettings)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -51956,12 +54868,18 @@ fn bindgen_test_layout__GSimpleActionGroup() {
     assert_eq!(
         ::std::mem::size_of::<_GSimpleActionGroup>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSimpleActionGroup))
+        concat!(
+            "Size of: ",
+            stringify!(_GSimpleActionGroup)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSimpleActionGroup>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSimpleActionGroup))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSimpleActionGroup)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -51998,12 +54916,18 @@ fn bindgen_test_layout__GSimpleActionGroupClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSimpleActionGroupClass>(),
         232usize,
-        concat!("Size of: ", stringify!(_GSimpleActionGroupClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSimpleActionGroupClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSimpleActionGroupClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSimpleActionGroupClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSimpleActionGroupClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -52254,12 +55178,18 @@ fn bindgen_test_layout__GSimpleProxyResolver() {
     assert_eq!(
         ::std::mem::size_of::<_GSimpleProxyResolver>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSimpleProxyResolver))
+        concat!(
+            "Size of: ",
+            stringify!(_GSimpleProxyResolver)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSimpleProxyResolver>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSimpleProxyResolver))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSimpleProxyResolver)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -52300,12 +55230,18 @@ fn bindgen_test_layout__GSimpleProxyResolverClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSimpleProxyResolverClass>(),
         176usize,
-        concat!("Size of: ", stringify!(_GSimpleProxyResolverClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSimpleProxyResolverClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSimpleProxyResolverClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSimpleProxyResolverClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSimpleProxyResolverClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -52425,12 +55361,18 @@ fn bindgen_test_layout__GSocketClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketClass>(),
         216usize,
-        concat!("Size of: ", stringify!(_GSocketClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -52556,12 +55498,18 @@ fn bindgen_test_layout__GSocket() {
     assert_eq!(
         ::std::mem::size_of::<_GSocket>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSocket))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocket)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocket>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocket))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocket)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -52960,12 +55908,18 @@ fn bindgen_test_layout__GSocketClientClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketClientClass>(),
         176usize,
-        concat!("Size of: ", stringify!(_GSocketClientClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketClientClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketClientClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketClientClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketClientClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -53041,12 +55995,18 @@ fn bindgen_test_layout__GSocketClient() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketClient>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSocketClient))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketClient)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketClient>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketClient))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketClient)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -53271,12 +56231,18 @@ fn bindgen_test_layout__GSocketConnectableIface() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketConnectableIface>(),
         40usize,
-        concat!("Size of: ", stringify!(_GSocketConnectableIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketConnectableIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketConnectableIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketConnectableIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketConnectableIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -53361,12 +56327,18 @@ fn bindgen_test_layout__GSocketConnectionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketConnectionClass>(),
         304usize,
-        concat!("Size of: ", stringify!(_GSocketConnectionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketConnectionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketConnectionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketConnectionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketConnectionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -53452,12 +56424,18 @@ fn bindgen_test_layout__GSocketConnection() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketConnection>(),
         40usize,
-        concat!("Size of: ", stringify!(_GSocketConnection))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketConnection)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketConnection>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketConnection))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketConnection)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -53589,12 +56567,18 @@ fn bindgen_test_layout__GSocketControlMessageClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketControlMessageClass>(),
         216usize,
-        concat!("Size of: ", stringify!(_GSocketControlMessageClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketControlMessageClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketControlMessageClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketControlMessageClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketControlMessageClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -53721,12 +56705,18 @@ fn bindgen_test_layout__GSocketControlMessage() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketControlMessage>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSocketControlMessage))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketControlMessage)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketControlMessage>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketControlMessage))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketControlMessage)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -53809,12 +56799,18 @@ fn bindgen_test_layout__GSocketListenerClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketListenerClass>(),
         192usize,
-        concat!("Size of: ", stringify!(_GSocketListenerClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketListenerClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketListenerClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketListenerClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketListenerClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -53910,12 +56906,18 @@ fn bindgen_test_layout__GSocketListener() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketListener>(),
         32usize,
-        concat!("Size of: ", stringify!(_GSocketListener))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketListener)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketListener>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketListener))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketListener)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -54067,12 +57069,18 @@ fn bindgen_test_layout__GSocketServiceClass() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketServiceClass>(),
         248usize,
-        concat!("Size of: ", stringify!(_GSocketServiceClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketServiceClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketServiceClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketServiceClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketServiceClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -54168,12 +57176,18 @@ fn bindgen_test_layout__GSocketService() {
     assert_eq!(
         ::std::mem::size_of::<_GSocketService>(),
         40usize,
-        concat!("Size of: ", stringify!(_GSocketService))
+        concat!(
+            "Size of: ",
+            stringify!(_GSocketService)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GSocketService>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GSocketService))
+        concat!(
+            "Alignment of ",
+            stringify!(_GSocketService)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -54674,12 +57688,18 @@ fn bindgen_test_layout__GTcpConnectionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTcpConnectionClass>(),
         304usize,
-        concat!("Size of: ", stringify!(_GTcpConnectionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTcpConnectionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTcpConnectionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTcpConnectionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTcpConnectionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -54705,12 +57725,18 @@ fn bindgen_test_layout__GTcpConnection() {
     assert_eq!(
         ::std::mem::size_of::<_GTcpConnection>(),
         48usize,
-        concat!("Size of: ", stringify!(_GTcpConnection))
+        concat!(
+            "Size of: ",
+            stringify!(_GTcpConnection)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTcpConnection>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTcpConnection))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTcpConnection)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -54765,12 +57791,18 @@ fn bindgen_test_layout__GTcpWrapperConnectionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTcpWrapperConnectionClass>(),
         304usize,
-        concat!("Size of: ", stringify!(_GTcpWrapperConnectionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTcpWrapperConnectionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTcpWrapperConnectionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTcpWrapperConnectionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTcpWrapperConnectionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -54797,12 +57829,18 @@ fn bindgen_test_layout__GTcpWrapperConnection() {
     assert_eq!(
         ::std::mem::size_of::<_GTcpWrapperConnection>(),
         56usize,
-        concat!("Size of: ", stringify!(_GTcpWrapperConnection))
+        concat!(
+            "Size of: ",
+            stringify!(_GTcpWrapperConnection)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTcpWrapperConnection>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTcpWrapperConnection))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTcpWrapperConnection)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -54936,12 +57974,18 @@ fn bindgen_test_layout__GThreadedSocketServiceClass() {
     assert_eq!(
         ::std::mem::size_of::<_GThreadedSocketServiceClass>(),
         296usize,
-        concat!("Size of: ", stringify!(_GThreadedSocketServiceClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GThreadedSocketServiceClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GThreadedSocketServiceClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GThreadedSocketServiceClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GThreadedSocketServiceClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -55028,12 +58072,18 @@ fn bindgen_test_layout__GThreadedSocketService() {
     assert_eq!(
         ::std::mem::size_of::<_GThreadedSocketService>(),
         48usize,
-        concat!("Size of: ", stringify!(_GThreadedSocketService))
+        concat!(
+            "Size of: ",
+            stringify!(_GThreadedSocketService)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GThreadedSocketService>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GThreadedSocketService))
+        concat!(
+            "Alignment of ",
+            stringify!(_GThreadedSocketService)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -55095,12 +58145,18 @@ fn bindgen_test_layout__GTlsBackendInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsBackendInterface>(),
         88usize,
-        concat!("Size of: ", stringify!(_GTlsBackendInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsBackendInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsBackendInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsBackendInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsBackendInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -55266,12 +58322,18 @@ fn bindgen_test_layout__GTlsCertificate() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsCertificate>(),
         32usize,
-        concat!("Size of: ", stringify!(_GTlsCertificate))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsCertificate)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsCertificate>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsCertificate))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsCertificate)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -55315,12 +58377,18 @@ fn bindgen_test_layout__GTlsCertificateClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsCertificateClass>(),
         208usize,
-        concat!("Size of: ", stringify!(_GTlsCertificateClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsCertificateClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsCertificateClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsCertificateClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsCertificateClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -55458,12 +58526,18 @@ fn bindgen_test_layout__GTlsConnection() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsConnection>(),
         40usize,
-        concat!("Size of: ", stringify!(_GTlsConnection))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsConnection)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsConnection>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsConnection))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsConnection)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -55539,12 +58613,18 @@ fn bindgen_test_layout__GTlsConnectionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsConnectionClass>(),
         352usize,
-        concat!("Size of: ", stringify!(_GTlsConnectionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsConnectionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsConnectionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsConnectionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsConnectionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -55766,12 +58846,18 @@ fn bindgen_test_layout__GTlsClientConnectionInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsClientConnectionInterface>(),
         24usize,
-        concat!("Size of: ", stringify!(_GTlsClientConnectionInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsClientConnectionInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsClientConnectionInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsClientConnectionInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsClientConnectionInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -55864,12 +58950,18 @@ fn bindgen_test_layout__GTlsDatabase() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsDatabase>(),
         32usize,
-        concat!("Size of: ", stringify!(_GTlsDatabase))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsDatabase)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsDatabase>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsDatabase))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsDatabase)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -56027,12 +59119,18 @@ fn bindgen_test_layout__GTlsDatabaseClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsDatabaseClass>(),
         368usize,
-        concat!("Size of: ", stringify!(_GTlsDatabaseClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsDatabaseClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsDatabaseClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsDatabaseClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsDatabaseClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -56343,12 +59441,18 @@ fn bindgen_test_layout__GTlsFileDatabaseInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsFileDatabaseInterface>(),
         80usize,
-        concat!("Size of: ", stringify!(_GTlsFileDatabaseInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsFileDatabaseInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsFileDatabaseInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsFileDatabaseInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsFileDatabaseInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -56400,12 +59504,18 @@ fn bindgen_test_layout__GTlsInteraction() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsInteraction>(),
         32usize,
-        concat!("Size of: ", stringify!(_GTlsInteraction))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsInteraction)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsInteraction>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsInteraction))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsInteraction)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -56492,12 +59602,18 @@ fn bindgen_test_layout__GTlsInteractionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsInteractionClass>(),
         352usize,
-        concat!("Size of: ", stringify!(_GTlsInteractionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsInteractionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsInteractionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsInteractionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsInteractionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -56670,12 +59786,18 @@ fn bindgen_test_layout__GTlsPassword() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsPassword>(),
         32usize,
-        concat!("Size of: ", stringify!(_GTlsPassword))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsPassword)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsPassword>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsPassword))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsPassword)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -56724,12 +59846,18 @@ fn bindgen_test_layout__GTlsPasswordClass() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsPasswordClass>(),
         192usize,
-        concat!("Size of: ", stringify!(_GTlsPasswordClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsPasswordClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsPasswordClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsPasswordClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsPasswordClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -56844,12 +59972,18 @@ fn bindgen_test_layout__GTlsServerConnectionInterface() {
     assert_eq!(
         ::std::mem::size_of::<_GTlsServerConnectionInterface>(),
         16usize,
-        concat!("Size of: ", stringify!(_GTlsServerConnectionInterface))
+        concat!(
+            "Size of: ",
+            stringify!(_GTlsServerConnectionInterface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GTlsServerConnectionInterface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GTlsServerConnectionInterface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GTlsServerConnectionInterface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -56897,12 +60031,18 @@ fn bindgen_test_layout__GUnixConnectionClass() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixConnectionClass>(),
         304usize,
-        concat!("Size of: ", stringify!(_GUnixConnectionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixConnectionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixConnectionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixConnectionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixConnectionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -56928,12 +60068,18 @@ fn bindgen_test_layout__GUnixConnection() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixConnection>(),
         48usize,
-        concat!("Size of: ", stringify!(_GUnixConnection))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixConnection)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixConnection>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixConnection))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixConnection)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -57044,12 +60190,18 @@ fn bindgen_test_layout__GUnixCredentialsMessageClass() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixCredentialsMessageClass>(),
         232usize,
-        concat!("Size of: ", stringify!(_GUnixCredentialsMessageClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixCredentialsMessageClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixCredentialsMessageClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixCredentialsMessageClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixCredentialsMessageClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -57096,12 +60248,18 @@ fn bindgen_test_layout__GUnixCredentialsMessage() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixCredentialsMessage>(),
         40usize,
-        concat!("Size of: ", stringify!(_GUnixCredentialsMessage))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixCredentialsMessage)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixCredentialsMessage>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixCredentialsMessage))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixCredentialsMessage)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -57171,12 +60329,18 @@ fn bindgen_test_layout__GUnixFDListClass() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixFDListClass>(),
         176usize,
-        concat!("Size of: ", stringify!(_GUnixFDListClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixFDListClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixFDListClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixFDListClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixFDListClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -57252,12 +60416,18 @@ fn bindgen_test_layout__GUnixFDList() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixFDList>(),
         32usize,
-        concat!("Size of: ", stringify!(_GUnixFDList))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixFDList)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixFDList>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixFDList))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixFDList)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -57334,12 +60504,18 @@ fn bindgen_test_layout__GUnixSocketAddress() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixSocketAddress>(),
         32usize,
-        concat!("Size of: ", stringify!(_GUnixSocketAddress))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixSocketAddress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixSocketAddress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixSocketAddress))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixSocketAddress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -57375,12 +60551,18 @@ fn bindgen_test_layout__GUnixSocketAddressClass() {
     assert_eq!(
         ::std::mem::size_of::<_GUnixSocketAddressClass>(),
         160usize,
-        concat!("Size of: ", stringify!(_GUnixSocketAddressClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GUnixSocketAddressClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GUnixSocketAddressClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GUnixSocketAddressClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GUnixSocketAddressClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -57451,12 +60633,18 @@ fn bindgen_test_layout__GVfs() {
     assert_eq!(
         ::std::mem::size_of::<_GVfs>(),
         24usize,
-        concat!("Size of: ", stringify!(_GVfs))
+        concat!(
+            "Size of: ",
+            stringify!(_GVfs)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVfs>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVfs))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVfs)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -57540,12 +60728,18 @@ fn bindgen_test_layout__GVfsClass() {
     assert_eq!(
         ::std::mem::size_of::<_GVfsClass>(),
         272usize,
-        concat!("Size of: ", stringify!(_GVfsClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GVfsClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVfsClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVfsClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVfsClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -57870,12 +61064,18 @@ fn bindgen_test_layout__GVolumeIface() {
     assert_eq!(
         ::std::mem::size_of::<_GVolumeIface>(),
         184usize,
-        concat!("Size of: ", stringify!(_GVolumeIface))
+        concat!(
+            "Size of: ",
+            stringify!(_GVolumeIface)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GVolumeIface>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GVolumeIface))
+        concat!(
+            "Alignment of ",
+            stringify!(_GVolumeIface)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).g_iface) as usize - ptr as usize },
@@ -58208,12 +61408,18 @@ fn bindgen_test_layout__GZlibCompressorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GZlibCompressorClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GZlibCompressorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GZlibCompressorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GZlibCompressorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GZlibCompressorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GZlibCompressorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -58258,12 +61464,18 @@ fn bindgen_test_layout__GZlibDecompressorClass() {
     assert_eq!(
         ::std::mem::size_of::<_GZlibDecompressorClass>(),
         136usize,
-        concat!("Size of: ", stringify!(_GZlibDecompressorClass))
+        concat!(
+            "Size of: ",
+            stringify!(_GZlibDecompressorClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_GZlibDecompressorClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_GZlibDecompressorClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_GZlibDecompressorClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -58871,12 +62083,18 @@ fn bindgen_test_layout__VipsBuf() {
     assert_eq!(
         ::std::mem::size_of::<_VipsBuf>(),
         32usize,
-        concat!("Size of: ", stringify!(_VipsBuf))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsBuf)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsBuf>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsBuf))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsBuf)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).base) as usize - ptr as usize },
@@ -59051,12 +62269,18 @@ fn bindgen_test_layout__VipsDbuf() {
     assert_eq!(
         ::std::mem::size_of::<_VipsDbuf>(),
         32usize,
-        concat!("Size of: ", stringify!(_VipsDbuf))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsDbuf)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsDbuf>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsDbuf))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsDbuf)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -60165,12 +63389,18 @@ fn bindgen_test_layout__VipsArgument() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArgument>(),
         8usize,
-        concat!("Size of: ", stringify!(_VipsArgument))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArgument)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArgument>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArgument))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArgument)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).pspec) as usize - ptr as usize },
@@ -60200,12 +63430,18 @@ fn bindgen_test_layout__VipsArgumentClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArgumentClass>(),
         32usize,
-        concat!("Size of: ", stringify!(_VipsArgumentClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArgumentClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArgumentClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArgumentClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArgumentClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent) as usize - ptr as usize },
@@ -60277,12 +63513,18 @@ fn bindgen_test_layout__VipsArgumentInstance() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArgumentInstance>(),
         48usize,
-        concat!("Size of: ", stringify!(_VipsArgumentInstance))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArgumentInstance)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArgumentInstance>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArgumentInstance))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArgumentInstance)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent) as usize - ptr as usize },
@@ -60452,12 +63694,18 @@ fn bindgen_test_layout__VipsObject() {
     assert_eq!(
         ::std::mem::size_of::<_VipsObject>(),
         80usize,
-        concat!("Size of: ", stringify!(_VipsObject))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsObject)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsObject>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsObject))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsObject)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -60615,12 +63863,18 @@ fn bindgen_test_layout__VipsObjectClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsObjectClass>(),
         328usize,
-        concat!("Size of: ", stringify!(_VipsObjectClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsObjectClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsObjectClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsObjectClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsObjectClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -61106,12 +64360,18 @@ fn bindgen_test_layout__VipsThing() {
     assert_eq!(
         ::std::mem::size_of::<_VipsThing>(),
         4usize,
-        concat!("Size of: ", stringify!(_VipsThing))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsThing)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsThing>(),
         4usize,
-        concat!("Alignment of ", stringify!(_VipsThing))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsThing)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).i) as usize - ptr as usize },
@@ -61151,12 +64411,18 @@ fn bindgen_test_layout__VipsArea() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArea>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsArea))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArea)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArea>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArea))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArea)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).data) as usize - ptr as usize },
@@ -61305,12 +64571,18 @@ fn bindgen_test_layout__VipsRefString() {
     assert_eq!(
         ::std::mem::size_of::<_VipsRefString>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsRefString))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsRefString)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsRefString>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsRefString))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsRefString)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).area) as usize - ptr as usize },
@@ -61348,12 +64620,18 @@ fn bindgen_test_layout__VipsBlob() {
     assert_eq!(
         ::std::mem::size_of::<_VipsBlob>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsBlob))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsBlob)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsBlob>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsBlob))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsBlob)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).area) as usize - ptr as usize },
@@ -61404,12 +64682,18 @@ fn bindgen_test_layout__VipsArrayDouble() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArrayDouble>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsArrayDouble))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArrayDouble)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArrayDouble>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArrayDouble))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArrayDouble)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).area) as usize - ptr as usize },
@@ -61453,12 +64737,18 @@ fn bindgen_test_layout__VipsArrayInt() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArrayInt>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsArrayInt))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArrayInt)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArrayInt>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArrayInt))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArrayInt)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).area) as usize - ptr as usize },
@@ -61502,12 +64792,18 @@ fn bindgen_test_layout__VipsArrayImage() {
     assert_eq!(
         ::std::mem::size_of::<_VipsArrayImage>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsArrayImage))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsArrayImage)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsArrayImage>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsArrayImage))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsArrayImage)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).area) as usize - ptr as usize },
@@ -61667,12 +64963,18 @@ fn bindgen_test_layout__VipsConnection() {
     assert_eq!(
         ::std::mem::size_of::<_VipsConnection>(),
         104usize,
-        concat!("Size of: ", stringify!(_VipsConnection))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsConnection)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsConnection>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsConnection))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsConnection)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -61738,12 +65040,18 @@ fn bindgen_test_layout__VipsConnectionClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsConnectionClass>(),
         328usize,
-        concat!("Size of: ", stringify!(_VipsConnectionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsConnectionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsConnectionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsConnectionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsConnectionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -61794,12 +65102,18 @@ fn bindgen_test_layout__VipsSource() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSource>(),
         184usize,
-        concat!("Size of: ", stringify!(_VipsSource))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSource)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSource>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSource))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSource)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -61948,12 +65262,18 @@ fn bindgen_test_layout__VipsSourceClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSourceClass>(),
         344usize,
-        concat!("Size of: ", stringify!(_VipsSourceClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSourceClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSourceClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSourceClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSourceClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62080,12 +65400,18 @@ fn bindgen_test_layout__VipsSourceCustom() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSourceCustom>(),
         184usize,
-        concat!("Size of: ", stringify!(_VipsSourceCustom))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSourceCustom)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSourceCustom>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSourceCustom))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSourceCustom)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -62126,12 +65452,18 @@ fn bindgen_test_layout__VipsSourceCustomClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSourceCustomClass>(),
         360usize,
-        concat!("Size of: ", stringify!(_VipsSourceCustomClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSourceCustomClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSourceCustomClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSourceCustomClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSourceCustomClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62184,12 +65516,18 @@ fn bindgen_test_layout__VipsGInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_VipsGInputStream>(),
         40usize,
-        concat!("Size of: ", stringify!(_VipsGInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsGInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsGInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsGInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsGInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -62226,12 +65564,18 @@ fn bindgen_test_layout__VipsGInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsGInputStreamClass>(),
         248usize,
-        concat!("Size of: ", stringify!(_VipsGInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsGInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsGInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsGInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsGInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62264,12 +65608,18 @@ fn bindgen_test_layout__VipsSourceGInputStream() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSourceGInputStream>(),
         208usize,
-        concat!("Size of: ", stringify!(_VipsSourceGInputStream))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSourceGInputStream)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSourceGInputStream>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSourceGInputStream))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSourceGInputStream)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -62326,12 +65676,18 @@ fn bindgen_test_layout__VipsSourceGInputStreamClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSourceGInputStreamClass>(),
         344usize,
-        concat!("Size of: ", stringify!(_VipsSourceGInputStreamClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSourceGInputStreamClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSourceGInputStreamClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSourceGInputStreamClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSourceGInputStreamClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62370,12 +65726,18 @@ fn bindgen_test_layout__VipsTarget() {
     assert_eq!(
         ::std::mem::size_of::<_VipsTarget>(),
         8656usize,
-        concat!("Size of: ", stringify!(_VipsTarget))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsTarget)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsTarget>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsTarget))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsTarget)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -62514,12 +65876,18 @@ fn bindgen_test_layout__VipsTargetClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsTargetClass>(),
         368usize,
-        concat!("Size of: ", stringify!(_VipsTargetClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsTargetClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsTargetClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsTargetClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsTargetClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62671,12 +66039,18 @@ fn bindgen_test_layout__VipsTargetCustom() {
     assert_eq!(
         ::std::mem::size_of::<_VipsTargetCustom>(),
         8656usize,
-        concat!("Size of: ", stringify!(_VipsTargetCustom))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsTargetCustom)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsTargetCustom>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsTargetCustom))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsTargetCustom)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -62728,12 +66102,18 @@ fn bindgen_test_layout__VipsTargetCustomClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsTargetCustomClass>(),
         408usize,
-        concat!("Size of: ", stringify!(_VipsTargetCustomClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsTargetCustomClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsTargetCustomClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsTargetCustomClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsTargetCustomClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62820,12 +66200,18 @@ fn bindgen_test_layout__VipsSbuf() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSbuf>(),
         8296usize,
-        concat!("Size of: ", stringify!(_VipsSbuf))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSbuf)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSbuf>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSbuf))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSbuf)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -62901,12 +66287,18 @@ fn bindgen_test_layout__VipsSbufClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsSbufClass>(),
         328usize,
-        concat!("Size of: ", stringify!(_VipsSbufClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsSbufClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsSbufClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsSbufClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsSbufClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -62968,12 +66360,18 @@ fn bindgen_test_layout__VipsRect() {
     assert_eq!(
         ::std::mem::size_of::<_VipsRect>(),
         16usize,
-        concat!("Size of: ", stringify!(_VipsRect))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsRect)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsRect>(),
         4usize,
-        concat!("Alignment of ", stringify!(_VipsRect))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsRect)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).left) as usize - ptr as usize },
@@ -63069,12 +66467,18 @@ fn bindgen_test_layout_VipsWindow() {
     assert_eq!(
         ::std::mem::size_of::<VipsWindow>(),
         48usize,
-        concat!("Size of: ", stringify!(VipsWindow))
+        concat!(
+            "Size of: ",
+            stringify!(VipsWindow)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<VipsWindow>(),
         8usize,
-        concat!("Alignment of ", stringify!(VipsWindow))
+        concat!(
+            "Alignment of ",
+            stringify!(VipsWindow)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -63166,12 +66570,18 @@ fn bindgen_test_layout_VipsBufferThread() {
     assert_eq!(
         ::std::mem::size_of::<VipsBufferThread>(),
         16usize,
-        concat!("Size of: ", stringify!(VipsBufferThread))
+        concat!(
+            "Size of: ",
+            stringify!(VipsBufferThread)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<VipsBufferThread>(),
         8usize,
-        concat!("Alignment of ", stringify!(VipsBufferThread))
+        concat!(
+            "Alignment of ",
+            stringify!(VipsBufferThread)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).hash) as usize - ptr as usize },
@@ -63211,12 +66621,18 @@ fn bindgen_test_layout__VipsBufferCache() {
     assert_eq!(
         ::std::mem::size_of::<_VipsBufferCache>(),
         48usize,
-        concat!("Size of: ", stringify!(_VipsBufferCache))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsBufferCache)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsBufferCache>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsBufferCache))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsBufferCache)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).buffers) as usize - ptr as usize },
@@ -63298,12 +66714,18 @@ fn bindgen_test_layout__VipsBuffer() {
     assert_eq!(
         ::std::mem::size_of::<_VipsBuffer>(),
         64usize,
-        concat!("Size of: ", stringify!(_VipsBuffer))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsBuffer)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsBuffer>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsBuffer))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsBuffer)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).ref_count) as usize - ptr as usize },
@@ -63510,12 +66932,18 @@ fn bindgen_test_layout_im__INTMASK() {
     assert_eq!(
         ::std::mem::size_of::<im__INTMASK>(),
         32usize,
-        concat!("Size of: ", stringify!(im__INTMASK))
+        concat!(
+            "Size of: ",
+            stringify!(im__INTMASK)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<im__INTMASK>(),
         8usize,
-        concat!("Alignment of ", stringify!(im__INTMASK))
+        concat!(
+            "Alignment of ",
+            stringify!(im__INTMASK)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).xsize) as usize - ptr as usize },
@@ -63596,12 +67024,18 @@ fn bindgen_test_layout_im__DOUBLEMASK() {
     assert_eq!(
         ::std::mem::size_of::<im__DOUBLEMASK>(),
         40usize,
-        concat!("Size of: ", stringify!(im__DOUBLEMASK))
+        concat!(
+            "Size of: ",
+            stringify!(im__DOUBLEMASK)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<im__DOUBLEMASK>(),
         8usize,
-        concat!("Alignment of ", stringify!(im__DOUBLEMASK))
+        concat!(
+            "Alignment of ",
+            stringify!(im__DOUBLEMASK)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).xsize) as usize - ptr as usize },
@@ -63902,12 +67336,18 @@ fn bindgen_test_layout__VipsRegion() {
     assert_eq!(
         ::std::mem::size_of::<_VipsRegion>(),
         168usize,
-        concat!("Size of: ", stringify!(_VipsRegion))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsRegion)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsRegion>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsRegion))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsRegion)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -64032,12 +67472,18 @@ fn bindgen_test_layout__VipsRegionClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsRegionClass>(),
         328usize,
-        concat!("Size of: ", stringify!(_VipsRegionClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsRegionClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsRegionClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsRegionClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsRegionClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -64256,12 +67702,18 @@ fn bindgen_test_layout__VipsProgress() {
     assert_eq!(
         ::std::mem::size_of::<_VipsProgress>(),
         48usize,
-        concat!("Size of: ", stringify!(_VipsProgress))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsProgress)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsProgress>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsProgress))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsProgress)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).im) as usize - ptr as usize },
@@ -64395,12 +67847,18 @@ fn bindgen_test_layout__VipsImage() {
     assert_eq!(
         ::std::mem::size_of::<_VipsImage>(),
         392usize,
-        concat!("Size of: ", stringify!(_VipsImage))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsImage)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsImage>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsImage))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsImage)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -64939,12 +68397,18 @@ fn bindgen_test_layout__VipsImageClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsImageClass>(),
         376usize,
-        concat!("Size of: ", stringify!(_VipsImageClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsImageClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsImageClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsImageClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsImageClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -65632,12 +69096,18 @@ fn bindgen_test_layout__VipsFormat() {
     assert_eq!(
         ::std::mem::size_of::<_VipsFormat>(),
         80usize,
-        concat!("Size of: ", stringify!(_VipsFormat))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsFormat)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsFormat>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsFormat))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsFormat)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -65689,12 +69159,18 @@ fn bindgen_test_layout__VipsFormatClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsFormatClass>(),
         384usize,
-        concat!("Size of: ", stringify!(_VipsFormatClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsFormatClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsFormatClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsFormatClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsFormatClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -65934,12 +69410,18 @@ fn bindgen_test_layout__VipsInterpolate() {
     assert_eq!(
         ::std::mem::size_of::<_VipsInterpolate>(),
         80usize,
-        concat!("Size of: ", stringify!(_VipsInterpolate))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsInterpolate)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsInterpolate>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsInterpolate))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsInterpolate)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -65984,12 +69466,18 @@ fn bindgen_test_layout__VipsInterpolateClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsInterpolateClass>(),
         368usize,
-        concat!("Size of: ", stringify!(_VipsInterpolateClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsInterpolateClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsInterpolateClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsInterpolateClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsInterpolateClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -66144,12 +69632,18 @@ fn bindgen_test_layout_VipsSemaphore() {
     assert_eq!(
         ::std::mem::size_of::<VipsSemaphore>(),
         32usize,
-        concat!("Size of: ", stringify!(VipsSemaphore))
+        concat!(
+            "Size of: ",
+            stringify!(VipsSemaphore)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<VipsSemaphore>(),
         8usize,
-        concat!("Alignment of ", stringify!(VipsSemaphore))
+        concat!(
+            "Alignment of ",
+            stringify!(VipsSemaphore)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).name) as usize - ptr as usize },
@@ -66246,12 +69740,18 @@ fn bindgen_test_layout__VipsThreadState() {
     assert_eq!(
         ::std::mem::size_of::<_VipsThreadState>(),
         144usize,
-        concat!("Size of: ", stringify!(_VipsThreadState))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsThreadState)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsThreadState>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsThreadState))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsThreadState)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -66358,12 +69858,18 @@ fn bindgen_test_layout__VipsThreadStateClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsThreadStateClass>(),
         328usize,
-        concat!("Size of: ", stringify!(_VipsThreadStateClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsThreadStateClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsThreadStateClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsThreadStateClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsThreadStateClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -66752,12 +70258,18 @@ fn bindgen_test_layout__VipsOperation() {
     assert_eq!(
         ::std::mem::size_of::<_VipsOperation>(),
         96usize,
-        concat!("Size of: ", stringify!(_VipsOperation))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsOperation)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsOperation>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsOperation))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsOperation)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_instance) as usize - ptr as usize },
@@ -66821,12 +70333,18 @@ fn bindgen_test_layout__VipsOperationClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsOperationClass>(),
         360usize,
-        concat!("Size of: ", stringify!(_VipsOperationClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsOperationClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsOperationClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsOperationClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsOperationClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -67003,12 +70521,18 @@ fn bindgen_test_layout__VipsForeign() {
     assert_eq!(
         ::std::mem::size_of::<_VipsForeign>(),
         96usize,
-        concat!("Size of: ", stringify!(_VipsForeign))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsForeign)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsForeign>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsForeign))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsForeign)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -67036,12 +70560,18 @@ fn bindgen_test_layout__VipsForeignClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsForeignClass>(),
         376usize,
-        concat!("Size of: ", stringify!(_VipsForeignClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsForeignClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsForeignClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsForeignClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsForeignClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -67121,12 +70651,18 @@ fn bindgen_test_layout__VipsForeignLoad() {
     assert_eq!(
         ::std::mem::size_of::<_VipsForeignLoad>(),
         152usize,
-        concat!("Size of: ", stringify!(_VipsForeignLoad))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsForeignLoad)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsForeignLoad>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsForeignLoad))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsForeignLoad)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -67282,12 +70818,18 @@ fn bindgen_test_layout__VipsForeignLoadClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsForeignLoadClass>(),
         432usize,
-        concat!("Size of: ", stringify!(_VipsForeignLoadClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsForeignLoadClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsForeignLoadClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsForeignLoadClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsForeignLoadClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -67441,12 +70983,18 @@ fn bindgen_test_layout__VipsForeignSave() {
     assert_eq!(
         ::std::mem::size_of::<_VipsForeignSave>(),
         136usize,
-        concat!("Size of: ", stringify!(_VipsForeignSave))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsForeignSave)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsForeignSave>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsForeignSave))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsForeignSave)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_object) as usize - ptr as usize },
@@ -67526,12 +71074,18 @@ fn bindgen_test_layout__VipsForeignSaveClass() {
     assert_eq!(
         ::std::mem::size_of::<_VipsForeignSaveClass>(),
         424usize,
-        concat!("Size of: ", stringify!(_VipsForeignSaveClass))
+        concat!(
+            "Size of: ",
+            stringify!(_VipsForeignSaveClass)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<_VipsForeignSaveClass>(),
         8usize,
-        concat!("Alignment of ", stringify!(_VipsForeignSaveClass))
+        concat!(
+            "Alignment of ",
+            stringify!(_VipsForeignSaveClass)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).parent_class) as usize - ptr as usize },
@@ -71307,12 +74861,18 @@ fn bindgen_test_layout___va_list_tag() {
     assert_eq!(
         ::std::mem::size_of::<__va_list_tag>(),
         24usize,
-        concat!("Size of: ", stringify!(__va_list_tag))
+        concat!(
+            "Size of: ",
+            stringify!(__va_list_tag)
+        )
     );
     assert_eq!(
         ::std::mem::align_of::<__va_list_tag>(),
         8usize,
-        concat!("Alignment of ", stringify!(__va_list_tag))
+        concat!(
+            "Alignment of ",
+            stringify!(__va_list_tag)
+        )
     );
     assert_eq!(
         unsafe { ::std::ptr::addr_of!((*ptr).gp_offset) as usize - ptr as usize },
